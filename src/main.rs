@@ -6,6 +6,7 @@ const MAIN_CSS: Asset = asset!("/assets/main.css");
 const TAILWIND_CSS: Asset = asset!("/assets/tailwind.css");
 
 mod components;
+mod project_store;
 mod views;
 
 use components::chrome_style_navbar::ChromeStyleNavbar;

@@ -1,10 +1,12 @@
 use dioxus::prelude::*;
-use serde::{Deserialize, Serialize};
-use std::fs::File;
-use std::io::BufReader;
+use std::fs;
 
 use crate::components::new_project_card::NewProjectCard;
 use crate::components::project_card::ProjectCard;
+
+use crate::project_store::{
+    add_project, delete_project, get_projects_by_name, load_projects, update_project, Project,
+};
 
 const PAGE_SIZE: usize = 7;
 
@@ -15,27 +17,10 @@ struct Tab {
     active: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
-pub struct Project {
-    pub name: String,
-    pub platform: String,
-    pub interface: String,
-    pub r#type: String,
-    pub description: String,
-    pub created_at: String,
-    pub updated_at: String,
-}
-
-pub fn load_projects_from_file(path: &str) -> Vec<Project> {
-    File::open(path)
-        .ok()
-        .map(|f| serde_json::from_reader(BufReader::new(f)).unwrap_or_default())
-        .unwrap_or_default()
-}
-
 #[component]
 pub fn HomePage() -> Element {
-    let projects = use_signal(|| load_projects_from_file("assets/realistic_projects.json"));
+    let projects = use_signal(|| load_projects());
+
     let current_page = use_signal(|| 0);
 
     let total_pages = (projects().len() + PAGE_SIZE - 1) / PAGE_SIZE;
@@ -65,6 +50,8 @@ pub fn HomePage() -> Element {
         let end = (start + PAGE_SIZE).min(projects().len());
         projects()[start..end].to_vec()
     };
+
+    // println!("Visible projects: {:#?}", visible_projects);
 
     // Tab management logic (unchanged)
     let mut tabs = use_signal(|| {
@@ -147,6 +134,10 @@ pub fn HomePage() -> Element {
         })
         .collect::<Vec<_>>();
 
+    // test_add_project();
+    test_get_projects_by_name();
+    // test_update_project();
+    // test_delete_project();
     rsx! {
         div {
             class: "relative px-2 border-b border-gray-300 flex items-end space-x-1",
@@ -214,6 +205,7 @@ pub fn HomePage() -> Element {
                             description: project.description.clone(),
                             created_at: project.created_at.clone(),
                             updated_at: project.updated_at.clone(),
+                            neurons: project.neurons.clone().map(|n| n)
                         }
                     }
                 })
@@ -236,5 +228,37 @@ pub fn HomePage() -> Element {
             }
             }
         }
+    }
+}
+
+pub fn test_add_project() {
+    let json = fs::read_to_string("assets/sample_project.json").expect("Failed to read file");
+    let project: Project = serde_json::from_str(&json).expect("Invalid JSON");
+    match add_project(project) {
+        Ok(_) => println!("Project added successfully."),
+        Err(e) => eprintln!("Error adding project: {}", e),
+    }
+}
+
+pub fn test_get_projects_by_name() {
+    let matches = get_projects_by_name(" ai");
+    for p in matches {
+        println!("Matched: {}", p.name);
+    }
+}
+
+pub fn test_update_project() {
+    let json = fs::read_to_string("assets/sample_project.json").expect("Failed to read file");
+    let project: Project = serde_json::from_str(&json).expect("Invalid JSON");
+    match update_project("SmartMartAI", project) {
+        Ok(_) => println!("Project updated successfully."),
+        Err(e) => eprintln!("Error updating project: {}", e),
+    }
+}
+
+pub fn test_delete_project() {
+    match delete_project("SmartMartAI_@@@@@@@@@@@") {
+        Ok(_) => println!("Project deleted successfully."),
+        Err(e) => eprintln!("Error deleting project: {}", e),
     }
 }

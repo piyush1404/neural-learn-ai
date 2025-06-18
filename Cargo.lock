@@ -2977,6 +2977,7 @@ dependencies = [
  "dioxus-desktop",
  "dioxus-signals",
  "image",
+ "regex",
  "rfd 0.15.3",
  "serde",
  "serde_json",

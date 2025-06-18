@@ -1,0 +1,169 @@
+{
+    "name": "SmartMartAI",
+    "platform": "Nvidia Jetson Xavier NX",
+    "interface": "HDMI",
+    "type": "vision",
+    "description": "Automated planogram compliance and stock monitoring for large-format Indian supermarkets.",
+    "created_at": "2024-03-12T08:00:00Z",
+    "updated_at": "2024-03-15T18:00:00Z",
+    "files": [
+        {
+            "id": 301,
+            "path": "images/smartmart_beverage_shelf.jpg",
+            "type": "image"
+        }
+    ],
+    "neurons": {
+        "min_if": 8,
+        "max_if": 50000,
+        "search_area": [
+            0,
+            0,
+            1920,
+            1080
+        ],
+        "total_neurons": 8192,
+        "committed_neurons": 64
+    },
+    "categories": [
+        {
+            "id": 1,
+            "name": "stocked",
+            "color": "#28a745",
+            "context_id": 501
+        },
+        {
+            "id": 2,
+            "name": "out_of_stock",
+            "color": "#dc3545",
+            "context_id": 502
+        },
+        {
+            "id": 3,
+            "name": "misplaced_item",
+            "color": "#ffc107",
+            "context_id": 503
+        }
+    ],
+    "feature_extraction": {
+        "algorithm": "SIFT",
+        "normalized": true,
+        "roi_width": 64,
+        "roi_height": 64,
+        "block_width": 3,
+        "block_height": 3,
+        "if_field_range": {
+            "min": 8,
+            "max": 50000
+        }
+    },
+    "learn_properties": {
+        "step_xy": {
+            "x": 4,
+            "y": 4,
+            "metric": "px"
+        },
+        "auto_learn": true
+    },
+    "recognize_properties": {
+        "output_mode": "Object",
+        "step_xy": {
+            "x": 4,
+            "y": 4,
+            "metric": "px"
+        },
+        "skip_xy": {
+            "x": 2,
+            "y": 2
+        },
+        "auto_recognize": true,
+        "full_image": true,
+        "show_mode": "Outline"
+    },
+    "annotations": {
+        "options": {
+            "auto_surrounding_examples": "Top5",
+            "positions": {
+                "directions": [
+                    "N",
+                    "E",
+                    "S",
+                    "W",
+                    "NE",
+                    "SE",
+                    "SW",
+                    "NW"
+                ],
+                "distance_to_center": 12
+            }
+        },
+        "annotations": [
+            {
+                "id": 1,
+                "category_id": 1,
+                "file_id": 301,
+                "x": 140,
+                "y": 210,
+                "width": 50,
+                "height": 50,
+                "label": "Coca-Cola 500ml"
+            },
+            {
+                "id": 2,
+                "category_id": 2,
+                "file_id": 301,
+                "x": 320,
+                "y": 215,
+                "width": 50,
+                "height": 50,
+                "label": "Empty Shelf Space"
+            },
+            {
+                "id": 3,
+                "category_id": 3,
+                "file_id": 301,
+                "x": 480,
+                "y": 220,
+                "width": 55,
+                "height": 55,
+                "label": "Biscuit Packet in Beverage Rack"
+            }
+        ]
+    },
+    "knowledge": {
+        "categories": [
+            {
+                "id": 1,
+                "base64": "c3RvY2tlZA=="
+            },
+            {
+                "id": 2,
+                "base64": "b3V0X29mX3N0b2Nr"
+            },
+            {
+                "id": 3,
+                "base64": "bWlzcGxhY2VkX2l0ZW0="
+            }
+        ],
+        "neurons": [
+            {
+                "neuron_id": 201,
+                "category": 1,
+                "ncr": 30985,
+                "model": "SuperShelfNet-v2",
+                "active_if": 14,
+                "min_if": 8,
+                "degenerate": false
+            },
+            {
+                "neuron_id": 202,
+                "category": 3,
+                "ncr": 12671,
+                "model": "SuperShelfNet-v2",
+                "active_if": 16,
+                "min_if": 8,
+                "degenerate": false
+            }
+        ]
+    }
+}
