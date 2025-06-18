@@ -1,0 +1,1360 @@
+[
+  {
+    "name": "RetailVisionAI",
+    "platform": "Nvidia Jetson",
+    "interface": "HDMI",
+    "type": "vision",
+    "description": "Smart shelf monitoring for retail stores.",
+    "created_at": "2024-01-10T09:15:00Z",
+    "updated_at": "2024-01-15T12:30:00Z",
+    "files": [
+      {
+        "id": 101,
+        "path": "images/retail_shelf_1.jpg",
+        "type": "image"
+      }
+    ],
+    "neurons": {
+      "min_if": 5,
+      "max_if": 45000,
+      "search_area": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "total_neurons": 4096,
+      "committed_neurons": 16
+    },
+    "categories": [
+      {
+        "id": 1,
+        "name": "empty_space",
+        "color": "#FF9900",
+        "context_id": 1
+      },
+      {
+        "id": 2,
+        "name": "product",
+        "color": "#33CC33",
+        "context_id": 2
+      }
+    ],
+    "feature_extraction": {
+      "algorithm": "HOG",
+      "normalized": true,
+      "roi_width": 64,
+      "roi_height": 64,
+      "block_width": 2,
+      "block_height": 2,
+      "if_field_range": {
+        "min": 5,
+        "max": 45000
+      }
+    },
+    "learn_properties": {
+      "step_xy": {
+        "x": 2,
+        "y": 2,
+        "metric": "px"
+      },
+      "auto_learn": true
+    },
+    "recognize_properties": {
+      "output_mode": "Object",
+      "step_xy": {
+        "x": 2,
+        "y": 2,
+        "metric": "px"
+      },
+      "skip_xy": {
+        "x": 2,
+        "y": 2
+      },
+      "auto_recognize": true,
+      "full_image": true,
+      "show_mode": "Heatmap"
+    },
+    "annotations": {
+      "options": {
+        "auto_surrounding_examples": "Top3",
+        "positions": {
+          "directions": [
+            "N",
+            "E",
+            "S",
+            "W"
+          ],
+          "distance_to_center": 8
+        }
+      },
+      "annotations": [
+        {
+          "id": 1,
+          "category_id": 1,
+          "file_id": 101,
+          "x": 12,
+          "y": 20,
+          "width": 30,
+          "height": 30,
+          "label": "Empty"
+        },
+        {
+          "id": 2,
+          "category_id": 2,
+          "file_id": 101,
+          "x": 60,
+          "y": 45,
+          "width": 25,
+          "height": 25,
+          "label": "Product"
+        }
+      ]
+    },
+    "knowledge": {
+      "categories": [
+        {
+          "id": 1,
+          "base64": "ZW1wdHlfc3BhY2U="
+        },
+        {
+          "id": 2,
+          "base64": "cHJvZHVjdA=="
+        }
+      ],
+      "neurons": [
+        {
+          "neuron_id": 11,
+          "category": 2,
+          "ncr": 25431,
+          "model": "RetailNet-v1",
+          "active_if": 18,
+          "min_if": 5,
+          "degenerate": false
+        }
+      ]
+    }
+  },
+  {
+    "name": "SmartParkingDetector",
+    "platform": "Raspberry Pi 4",
+    "interface": "WiFi",
+    "type": "vision",
+    "description": "Detects vacant and occupied parking slots in open lots.",
+    "created_at": "2024-02-12T10:00:00Z",
+    "updated_at": "2024-02-14T15:30:00Z",
+    "files": [
+      {
+        "id": 102,
+        "path": "images/parking_lot_1.jpg",
+        "type": "image"
+      }
+    ],
+    "neurons": {
+      "min_if": 3,
+      "max_if": 30000,
+      "search_area": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "total_neurons": 8192,
+      "committed_neurons": 25
+    },
+    "categories": [
+      {
+        "id": 1,
+        "name": "vacant",
+        "color": "#00FF00",
+        "context_id": 1
+      },
+      {
+        "id": 2,
+        "name": "occupied",
+        "color": "#FF0000",
+        "context_id": 2
+      }
+    ],
+    "feature_extraction": {
+      "algorithm": "SIFT",
+      "normalized": false,
+      "roi_width": 128,
+      "roi_height": 128,
+      "block_width": 4,
+      "block_height": 4,
+      "if_field_range": {
+        "min": 3,
+        "max": 30000
+      }
+    },
+    "learn_properties": {
+      "step_xy": {
+        "x": 4,
+        "y": 4,
+        "metric": "px"
+      },
+      "auto_learn": false
+    },
+    "recognize_properties": {
+      "output_mode": "Class",
+      "step_xy": {
+        "x": 4,
+        "y": 4,
+        "metric": "px"
+      },
+      "skip_xy": {
+        "x": 1,
+        "y": 1
+      },
+      "auto_recognize": true,
+      "full_image": false,
+      "show_mode": "Box"
+    },
+    "annotations": {
+      "options": {
+        "auto_surrounding_examples": "None",
+        "positions": {
+          "directions": [
+            "N",
+            "S"
+          ],
+          "distance_to_center": 5
+        }
+      },
+      "annotations": [
+        {
+          "id": 3,
+          "category_id": 1,
+          "file_id": 102,
+          "x": 40,
+          "y": 70,
+          "width": 40,
+          "height": 20,
+          "label": "Vacant"
+        },
+        {
+          "id": 4,
+          "category_id": 2,
+          "file_id": 102,
+          "x": 100,
+          "y": 90,
+          "width": 45,
+          "height": 25,
+          "label": "Occupied"
+        }
+      ]
+    },
+    "knowledge": {
+      "categories": [
+        {
+          "id": 1,
+          "base64": "dmFjYW50"
+        },
+        {
+          "id": 2,
+          "base64": "b2NjdXBpZWQ="
+        }
+      ],
+      "neurons": [
+        {
+          "neuron_id": 21,
+          "category": 1,
+          "ncr": 12345,
+          "model": "ParkDetect-v2",
+          "active_if": 20,
+          "min_if": 3,
+          "degenerate": false
+        }
+      ]
+    }
+  },
+  {
+    "name": "IndustrialDefectScanner",
+    "platform": "Intel NUC",
+    "interface": "USB-C",
+    "type": "vision",
+    "description": "IndustrialDefectScanner is an advanced computer vision application.",
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-06T10:00:00Z",
+    "files": [
+      {
+        "id": 103,
+        "path": "images/industrial_defect.jpg",
+        "type": "image"
+      }
+    ],
+    "neurons": {
+      "min_if": 1,
+      "max_if": 53901,
+      "search_area": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "total_neurons": 2048,
+      "committed_neurons": 25
+    },
+    "categories": [
+      {
+        "id": 1,
+        "name": "class1",
+        "color": "#FF0000",
+        "context_id": 1
+      },
+      {
+        "id": 2,
+        "name": "class2",
+        "color": "#00FF00",
+        "context_id": 2
+      }
+    ],
+    "feature_extraction": {
+      "algorithm": "HOG",
+      "normalized": true,
+      "roi_width": 64,
+      "roi_height": 64,
+      "block_width": 2,
+      "block_height": 2,
+      "if_field_range": {
+        "min": 2,
+        "max": 35535
+      }
+    },
+    "learn_properties": {
+      "step_xy": {
+        "x": 1,
+        "y": 1,
+        "metric": "px"
+      },
+      "auto_learn": false
+    },
+    "recognize_properties": {
+      "output_mode": "Object",
+      "step_xy": {
+        "x": 2,
+        "y": 2,
+        "metric": "px"
+      },
+      "skip_xy": {
+        "x": 1,
+        "y": 1
+      },
+      "auto_recognize": true,
+      "full_image": false,
+      "show_mode": "Box"
+    },
+    "annotations": {
+      "options": {
+        "auto_surrounding_examples": "Top3",
+        "positions": {
+          "directions": [
+            "N",
+            "E",
+            "S",
+            "W"
+          ],
+          "distance_to_center": 10
+        }
+      },
+      "annotations": [
+        {
+          "id": 7,
+          "category_id": 1,
+          "file_id": 103,
+          "x": 10,
+          "y": 10,
+          "width": 20,
+          "height": 20,
+          "label": "Class1"
+        },
+        {
+          "id": 8,
+          "category_id": 2,
+          "file_id": 103,
+          "x": 40,
+          "y": 40,
+          "width": 30,
+          "height": 30,
+          "label": "Class2"
+        }
+      ]
+    },
+    "knowledge": {
+      "categories": [
+        {
+          "id": 1,
+          "base64": "Y2xhc3Mx"
+        },
+        {
+          "id": 2,
+          "base64": "Y2xhc3My"
+        }
+      ],
+      "neurons": [
+        {
+          "neuron_id": 3,
+          "category": 1,
+          "ncr": 29057,
+          "model": "Model-3",
+          "active_if": 20,
+          "min_if": 2,
+          "degenerate": false
+        }
+      ]
+    }
+  },
+  {
+    "name": "LicensePlateReader",
+    "platform": "AWS Panorama",
+    "interface": "Ethernet",
+    "type": "vision",
+    "description": "LicensePlateReader is an advanced computer vision application.",
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-24T10:00:00Z",
+    "files": [
+      {
+        "id": 104,
+        "path": "images/license_plate.jpg",
+        "type": "image"
+      }
+    ],
+    "neurons": {
+      "min_if": 9,
+      "max_if": 40230,
+      "search_area": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "total_neurons": 2048,
+      "committed_neurons": 10
+    },
+    "categories": [
+      {
+        "id": 1,
+        "name": "class1",
+        "color": "#FF0000",
+        "context_id": 1
+      },
+      {
+        "id": 2,
+        "name": "class2",
+        "color": "#00FF00",
+        "context_id": 2
+      }
+    ],
+    "feature_extraction": {
+      "algorithm": "HOG",
+      "normalized": true,
+      "roi_width": 64,
+      "roi_height": 64,
+      "block_width": 2,
+      "block_height": 2,
+      "if_field_range": {
+        "min": 2,
+        "max": 35535
+      }
+    },
+    "learn_properties": {
+      "step_xy": {
+        "x": 1,
+        "y": 1,
+        "metric": "px"
+      },
+      "auto_learn": false
+    },
+    "recognize_properties": {
+      "output_mode": "Object",
+      "step_xy": {
+        "x": 2,
+        "y": 2,
+        "metric": "px"
+      },
+      "skip_xy": {
+        "x": 1,
+        "y": 1
+      },
+      "auto_recognize": true,
+      "full_image": false,
+      "show_mode": "Box"
+    },
+    "annotations": {
+      "options": {
+        "auto_surrounding_examples": "Top3",
+        "positions": {
+          "directions": [
+            "N",
+            "E",
+            "S",
+            "W"
+          ],
+          "distance_to_center": 10
+        }
+      },
+      "annotations": [
+        {
+          "id": 9,
+          "category_id": 1,
+          "file_id": 104,
+          "x": 10,
+          "y": 10,
+          "width": 20,
+          "height": 20,
+          "label": "Class1"
+        },
+        {
+          "id": 10,
+          "category_id": 2,
+          "file_id": 104,
+          "x": 40,
+          "y": 40,
+          "width": 30,
+          "height": 30,
+          "label": "Class2"
+        }
+      ]
+    },
+    "knowledge": {
+      "categories": [
+        {
+          "id": 1,
+          "base64": "Y2xhc3Mx"
+        },
+        {
+          "id": 2,
+          "base64": "Y2xhc3My"
+        }
+      ],
+      "neurons": [
+        {
+          "neuron_id": 4,
+          "category": 1,
+          "ncr": 40219,
+          "model": "Model-4",
+          "active_if": 14,
+          "min_if": 2,
+          "degenerate": false
+        }
+      ]
+    }
+  },
+  {
+    "name": "MedicalXRayAnalyzer",
+    "platform": "Azure VM",
+    "interface": "REST",
+    "type": "vision",
+    "description": "MedicalXRayAnalyzer is an advanced computer vision application.",
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-17T10:00:00Z",
+    "files": [
+      {
+        "id": 105,
+        "path": "images/xray_analysis.jpg",
+        "type": "image"
+      }
+    ],
+    "neurons": {
+      "min_if": 10,
+      "max_if": 30131,
+      "search_area": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "total_neurons": 2048,
+      "committed_neurons": 18
+    },
+    "categories": [
+      {
+        "id": 1,
+        "name": "class1",
+        "color": "#FF0000",
+        "context_id": 1
+      },
+      {
+        "id": 2,
+        "name": "class2",
+        "color": "#00FF00",
+        "context_id": 2
+      }
+    ],
+    "feature_extraction": {
+      "algorithm": "HOG",
+      "normalized": true,
+      "roi_width": 64,
+      "roi_height": 64,
+      "block_width": 2,
+      "block_height": 2,
+      "if_field_range": {
+        "min": 2,
+        "max": 35535
+      }
+    },
+    "learn_properties": {
+      "step_xy": {
+        "x": 1,
+        "y": 1,
+        "metric": "px"
+      },
+      "auto_learn": false
+    },
+    "recognize_properties": {
+      "output_mode": "Object",
+      "step_xy": {
+        "x": 2,
+        "y": 2,
+        "metric": "px"
+      },
+      "skip_xy": {
+        "x": 1,
+        "y": 1
+      },
+      "auto_recognize": true,
+      "full_image": false,
+      "show_mode": "Box"
+    },
+    "annotations": {
+      "options": {
+        "auto_surrounding_examples": "Top3",
+        "positions": {
+          "directions": [
+            "N",
+            "E",
+            "S",
+            "W"
+          ],
+          "distance_to_center": 10
+        }
+      },
+      "annotations": [
+        {
+          "id": 11,
+          "category_id": 1,
+          "file_id": 105,
+          "x": 10,
+          "y": 10,
+          "width": 20,
+          "height": 20,
+          "label": "Class1"
+        },
+        {
+          "id": 12,
+          "category_id": 2,
+          "file_id": 105,
+          "x": 40,
+          "y": 40,
+          "width": 30,
+          "height": 30,
+          "label": "Class2"
+        }
+      ]
+    },
+    "knowledge": {
+      "categories": [
+        {
+          "id": 1,
+          "base64": "Y2xhc3Mx"
+        },
+        {
+          "id": 2,
+          "base64": "Y2xhc3My"
+        }
+      ],
+      "neurons": [
+        {
+          "neuron_id": 5,
+          "category": 1,
+          "ncr": 27646,
+          "model": "Model-5",
+          "active_if": 19,
+          "min_if": 2,
+          "degenerate": false
+        }
+      ]
+    }
+  },
+  {
+    "name": "WildlifeTrackerAI",
+    "platform": "Edge TPU",
+    "interface": "LTE",
+    "type": "vision",
+    "description": "WildlifeTrackerAI is an advanced computer vision application.",
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-18T10:00:00Z",
+    "files": [
+      {
+        "id": 106,
+        "path": "images/wildlife_cam.jpg",
+        "type": "image"
+      }
+    ],
+    "neurons": {
+      "min_if": 9,
+      "max_if": 54110,
+      "search_area": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "total_neurons": 2048,
+      "committed_neurons": 23
+    },
+    "categories": [
+      {
+        "id": 1,
+        "name": "class1",
+        "color": "#FF0000",
+        "context_id": 1
+      },
+      {
+        "id": 2,
+        "name": "class2",
+        "color": "#00FF00",
+        "context_id": 2
+      }
+    ],
+    "feature_extraction": {
+      "algorithm": "HOG",
+      "normalized": true,
+      "roi_width": 64,
+      "roi_height": 64,
+      "block_width": 2,
+      "block_height": 2,
+      "if_field_range": {
+        "min": 2,
+        "max": 35535
+      }
+    },
+    "learn_properties": {
+      "step_xy": {
+        "x": 1,
+        "y": 1,
+        "metric": "px"
+      },
+      "auto_learn": true
+    },
+    "recognize_properties": {
+      "output_mode": "Object",
+      "step_xy": {
+        "x": 2,
+        "y": 2,
+        "metric": "px"
+      },
+      "skip_xy": {
+        "x": 1,
+        "y": 1
+      },
+      "auto_recognize": true,
+      "full_image": false,
+      "show_mode": "Box"
+    },
+    "annotations": {
+      "options": {
+        "auto_surrounding_examples": "Top3",
+        "positions": {
+          "directions": [
+            "N",
+            "E",
+            "S",
+            "W"
+          ],
+          "distance_to_center": 10
+        }
+      },
+      "annotations": [
+        {
+          "id": 13,
+          "category_id": 1,
+          "file_id": 106,
+          "x": 10,
+          "y": 10,
+          "width": 20,
+          "height": 20,
+          "label": "Class1"
+        },
+        {
+          "id": 14,
+          "category_id": 2,
+          "file_id": 106,
+          "x": 40,
+          "y": 40,
+          "width": 30,
+          "height": 30,
+          "label": "Class2"
+        }
+      ]
+    },
+    "knowledge": {
+      "categories": [
+        {
+          "id": 1,
+          "base64": "Y2xhc3Mx"
+        },
+        {
+          "id": 2,
+          "base64": "Y2xhc3My"
+        }
+      ],
+      "neurons": [
+        {
+          "neuron_id": 6,
+          "category": 1,
+          "ncr": 35568,
+          "model": "Model-6",
+          "active_if": 13,
+          "min_if": 2,
+          "degenerate": false
+        }
+      ]
+    }
+  },
+  {
+    "name": "DroneSurveillanceVision",
+    "platform": "Nvidia Xavier",
+    "interface": "5G",
+    "type": "vision",
+    "description": "DroneSurveillanceVision is an advanced computer vision application.",
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-18T10:00:00Z",
+    "files": [
+      {
+        "id": 107,
+        "path": "images/drone_view.jpg",
+        "type": "image"
+      }
+    ],
+    "neurons": {
+      "min_if": 1,
+      "max_if": 47325,
+      "search_area": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "total_neurons": 4096,
+      "committed_neurons": 8
+    },
+    "categories": [
+      {
+        "id": 1,
+        "name": "class1",
+        "color": "#FF0000",
+        "context_id": 1
+      },
+      {
+        "id": 2,
+        "name": "class2",
+        "color": "#00FF00",
+        "context_id": 2
+      }
+    ],
+    "feature_extraction": {
+      "algorithm": "HOG",
+      "normalized": true,
+      "roi_width": 64,
+      "roi_height": 64,
+      "block_width": 2,
+      "block_height": 2,
+      "if_field_range": {
+        "min": 2,
+        "max": 35535
+      }
+    },
+    "learn_properties": {
+      "step_xy": {
+        "x": 1,
+        "y": 1,
+        "metric": "px"
+      },
+      "auto_learn": true
+    },
+    "recognize_properties": {
+      "output_mode": "Object",
+      "step_xy": {
+        "x": 2,
+        "y": 2,
+        "metric": "px"
+      },
+      "skip_xy": {
+        "x": 1,
+        "y": 1
+      },
+      "auto_recognize": true,
+      "full_image": false,
+      "show_mode": "Box"
+    },
+    "annotations": {
+      "options": {
+        "auto_surrounding_examples": "Top3",
+        "positions": {
+          "directions": [
+            "N",
+            "E",
+            "S",
+            "W"
+          ],
+          "distance_to_center": 10
+        }
+      },
+      "annotations": [
+        {
+          "id": 15,
+          "category_id": 1,
+          "file_id": 107,
+          "x": 10,
+          "y": 10,
+          "width": 20,
+          "height": 20,
+          "label": "Class1"
+        },
+        {
+          "id": 16,
+          "category_id": 2,
+          "file_id": 107,
+          "x": 40,
+          "y": 40,
+          "width": 30,
+          "height": 30,
+          "label": "Class2"
+        }
+      ]
+    },
+    "knowledge": {
+      "categories": [
+        {
+          "id": 1,
+          "base64": "Y2xhc3Mx"
+        },
+        {
+          "id": 2,
+          "base64": "Y2xhc3My"
+        }
+      ],
+      "neurons": [
+        {
+          "neuron_id": 7,
+          "category": 1,
+          "ncr": 22453,
+          "model": "Model-7",
+          "active_if": 16,
+          "min_if": 2,
+          "degenerate": false
+        }
+      ]
+    }
+  },
+  {
+    "name": "SmartAttendanceCamera",
+    "platform": "Android",
+    "interface": "Bluetooth",
+    "type": "vision",
+    "description": "SmartAttendanceCamera is an advanced computer vision application.",
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-31T10:00:00Z",
+    "files": [
+      {
+        "id": 108,
+        "path": "images/attendance_face.jpg",
+        "type": "image"
+      }
+    ],
+    "neurons": {
+      "min_if": 1,
+      "max_if": 35705,
+      "search_area": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "total_neurons": 4096,
+      "committed_neurons": 23
+    },
+    "categories": [
+      {
+        "id": 1,
+        "name": "class1",
+        "color": "#FF0000",
+        "context_id": 1
+      },
+      {
+        "id": 2,
+        "name": "class2",
+        "color": "#00FF00",
+        "context_id": 2
+      }
+    ],
+    "feature_extraction": {
+      "algorithm": "HOG",
+      "normalized": true,
+      "roi_width": 64,
+      "roi_height": 64,
+      "block_width": 2,
+      "block_height": 2,
+      "if_field_range": {
+        "min": 2,
+        "max": 35535
+      }
+    },
+    "learn_properties": {
+      "step_xy": {
+        "x": 1,
+        "y": 1,
+        "metric": "px"
+      },
+      "auto_learn": false
+    },
+    "recognize_properties": {
+      "output_mode": "Object",
+      "step_xy": {
+        "x": 2,
+        "y": 2,
+        "metric": "px"
+      },
+      "skip_xy": {
+        "x": 1,
+        "y": 1
+      },
+      "auto_recognize": true,
+      "full_image": false,
+      "show_mode": "Box"
+    },
+    "annotations": {
+      "options": {
+        "auto_surrounding_examples": "Top3",
+        "positions": {
+          "directions": [
+            "N",
+            "E",
+            "S",
+            "W"
+          ],
+          "distance_to_center": 10
+        }
+      },
+      "annotations": [
+        {
+          "id": 17,
+          "category_id": 1,
+          "file_id": 108,
+          "x": 10,
+          "y": 10,
+          "width": 20,
+          "height": 20,
+          "label": "Class1"
+        },
+        {
+          "id": 18,
+          "category_id": 2,
+          "file_id": 108,
+          "x": 40,
+          "y": 40,
+          "width": 30,
+          "height": 30,
+          "label": "Class2"
+        }
+      ]
+    },
+    "knowledge": {
+      "categories": [
+        {
+          "id": 1,
+          "base64": "Y2xhc3Mx"
+        },
+        {
+          "id": 2,
+          "base64": "Y2xhc3My"
+        }
+      ],
+      "neurons": [
+        {
+          "neuron_id": 8,
+          "category": 1,
+          "ncr": 32214,
+          "model": "Model-8",
+          "active_if": 9,
+          "min_if": 2,
+          "degenerate": false
+        }
+      ]
+    }
+  },
+  {
+    "name": "ConstructionHelmetDetector",
+    "platform": "Jetson Nano",
+    "interface": "WiFi",
+    "type": "vision",
+    "description": "ConstructionHelmetDetector is an advanced computer vision application.",
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-08T10:00:00Z",
+    "files": [
+      {
+        "id": 109,
+        "path": "images/helmet_detection.jpg",
+        "type": "image"
+      }
+    ],
+    "neurons": {
+      "min_if": 9,
+      "max_if": 33255,
+      "search_area": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "total_neurons": 2048,
+      "committed_neurons": 27
+    },
+    "categories": [
+      {
+        "id": 1,
+        "name": "class1",
+        "color": "#FF0000",
+        "context_id": 1
+      },
+      {
+        "id": 2,
+        "name": "class2",
+        "color": "#00FF00",
+        "context_id": 2
+      }
+    ],
+    "feature_extraction": {
+      "algorithm": "HOG",
+      "normalized": true,
+      "roi_width": 64,
+      "roi_height": 64,
+      "block_width": 2,
+      "block_height": 2,
+      "if_field_range": {
+        "min": 2,
+        "max": 35535
+      }
+    },
+    "learn_properties": {
+      "step_xy": {
+        "x": 1,
+        "y": 1,
+        "metric": "px"
+      },
+      "auto_learn": true
+    },
+    "recognize_properties": {
+      "output_mode": "Object",
+      "step_xy": {
+        "x": 2,
+        "y": 2,
+        "metric": "px"
+      },
+      "skip_xy": {
+        "x": 1,
+        "y": 1
+      },
+      "auto_recognize": true,
+      "full_image": false,
+      "show_mode": "Box"
+    },
+    "annotations": {
+      "options": {
+        "auto_surrounding_examples": "Top3",
+        "positions": {
+          "directions": [
+            "N",
+            "E",
+            "S",
+            "W"
+          ],
+          "distance_to_center": 10
+        }
+      },
+      "annotations": [
+        {
+          "id": 19,
+          "category_id": 1,
+          "file_id": 109,
+          "x": 10,
+          "y": 10,
+          "width": 20,
+          "height": 20,
+          "label": "Class1"
+        },
+        {
+          "id": 20,
+          "category_id": 2,
+          "file_id": 109,
+          "x": 40,
+          "y": 40,
+          "width": 30,
+          "height": 30,
+          "label": "Class2"
+        }
+      ]
+    },
+    "knowledge": {
+      "categories": [
+        {
+          "id": 1,
+          "base64": "Y2xhc3Mx"
+        },
+        {
+          "id": 2,
+          "base64": "Y2xhc3My"
+        }
+      ],
+      "neurons": [
+        {
+          "neuron_id": 9,
+          "category": 1,
+          "ncr": 14654,
+          "model": "Model-9",
+          "active_if": 8,
+          "min_if": 2,
+          "degenerate": false
+        }
+      ]
+    }
+  },
+  {
+    "name": "FoodQualityInspection",
+    "platform": "Intel i7",
+    "interface": "LAN",
+    "type": "vision",
+    "description": "FoodQualityInspection is an advanced computer vision application.",
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-23T10:00:00Z",
+    "files": [
+      {
+        "id": 110,
+        "path": "images/food_quality.jpg",
+        "type": "image"
+      }
+    ],
+    "neurons": {
+      "min_if": 3,
+      "max_if": 39591,
+      "search_area": [
+        0,
+        0,
+        128,
+        128
+      ],
+      "total_neurons": 4096,
+      "committed_neurons": 6
+    },
+    "categories": [
+      {
+        "id": 1,
+        "name": "class1",
+        "color": "#FF0000",
+        "context_id": 1
+      },
+      {
+        "id": 2,
+        "name": "class2",
+        "color": "#00FF00",
+        "context_id": 2
+      }
+    ],
+    "feature_extraction": {
+      "algorithm": "HOG",
+      "normalized": true,
+      "roi_width": 64,
+      "roi_height": 64,
+      "block_width": 2,
+      "block_height": 2,
+      "if_field_range": {
+        "min": 2,
+        "max": 35535
+      }
+    },
+    "learn_properties": {
+      "step_xy": {
+        "x": 1,
+        "y": 1,
+        "metric": "px"
+      },
+      "auto_learn": false
+    },
+    "recognize_properties": {
+      "output_mode": "Object",
+      "step_xy": {
+        "x": 2,
+        "y": 2,
+        "metric": "px"
+      },
+      "skip_xy": {
+        "x": 1,
+        "y": 1
+      },
+      "auto_recognize": true,
+      "full_image": false,
+      "show_mode": "Box"
+    },
+    "annotations": {
+      "options": {
+        "auto_surrounding_examples": "Top3",
+        "positions": {
+          "directions": [
+            "N",
+            "E",
+            "S",
+            "W"
+          ],
+          "distance_to_center": 10
+        }
+      },
+      "annotations": [
+        {
+          "id": 21,
+          "category_id": 1,
+          "file_id": 110,
+          "x": 10,
+          "y": 10,
+          "width": 20,
+          "height": 20,
+          "label": "Class1"
+        },
+        {
+          "id": 22,
+          "category_id": 2,
+          "file_id": 110,
+          "x": 40,
+          "y": 40,
+          "width": 30,
+          "height": 30,
+          "label": "Class2"
+        }
+      ]
+    },
+    "knowledge": {
+      "categories": [
+        {
+          "id": 1,
+          "base64": "Y2xhc3Mx"
+        },
+        {
+          "id": 2,
+          "base64": "Y2xhc3My"
+        }
+      ],
+      "neurons": [
+        {
+          "neuron_id": 10,
+          "category": 1,
+          "ncr": 18848,
+          "model": "Model-10",
+          "active_if": 20,
+          "min_if": 2,
+          "degenerate": false
+        }
+      ]
+    }
+  }
+]
