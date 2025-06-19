@@ -33,7 +33,7 @@ fn App() -> Element {
          style { "{include_str!(\"../assets/tailwind.css\")}" }
 
         div {
-            class: "w-full h-full bg-white font-sans p-2",
+            class: "w-full h-full bg-white font-sans px-7",
             // ChromeStyleNavbar {}
 
             HomePage {}
