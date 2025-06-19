@@ -7,10 +7,22 @@ pub fn NewProjectCard() -> Element {
     rsx! {
         // New Project Card Trigger
         div {
-            class: "border border-dashed rounded-lg flex items-center justify-center h-48 text-blue-500 cursor-pointer",
+            class: "border border-[#BEBEBE] rounded-xl shadow-sm flex flex-col items-center justify-center gap-2 cursor-pointer",
             onclick: move |_| show_modal.set(true),
-            "+ New Project"
+
+            // Dashed box with "+"
+            div {
+                class: "w-20 h-20 border-2 border-dashed border-[#999999] flex items-center justify-center text-[#0387D9] text-xl rounded-sm",
+                "+"
+            }
+
+            // Label text
+            span {
+                class: "text-[#0387D9] text-sm font-medium",
+                "New Project"
+            }
         }
+
 
         // Modal
         if *show_modal.read() {

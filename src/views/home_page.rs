@@ -21,7 +21,7 @@ struct Tab {
 pub fn HomePage() -> Element {
     let projects = use_signal(|| load_projects());
 
-    let current_page = use_signal(|| 0);
+    let mut current_page = use_signal(|| 0);
 
     let total_pages = (projects().len() + PAGE_SIZE - 1) / PAGE_SIZE;
 
@@ -135,9 +135,12 @@ pub fn HomePage() -> Element {
         .collect::<Vec<_>>();
 
     // test_add_project();
-    test_get_projects_by_name();
+    // test_get_projects_by_name();
     // test_update_project();
     // test_delete_project();
+
+    let page_info = format!("{:02}/{:02}", current_page() + 1, total_pages);
+
     rsx! {
         div {
             class: "relative px-2 border-b border-gray-300 flex items-end space-x-1",
@@ -196,7 +199,8 @@ pub fn HomePage() -> Element {
             div {
                 class: "grid grid-cols-4 gap-4 p-4",
                 NewProjectCard {},
-               { visible_projects.into_iter().map(|project| {
+               {
+                visible_projects.into_iter().map(|project| {
                     rsx! {
                         ProjectCard {
                             name: project.name.clone(),
@@ -211,22 +215,47 @@ pub fn HomePage() -> Element {
                 })
             }
             div {
-                class: "absolute bottom-4 right-4 flex items-center gap-4 bg-white px-4 py-2 rounded shadow-md",
+                class: "absolute bottom-4 right-4 flex items-center gap-2 bg-white px-4 py-2 rounded shadow-md",
+
+                // First Page (⏪)
                 button {
-                    class: "px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50",
+                    class: "w-9 h-9 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center disabled:opacity-50",
+                    onclick: move |_| current_page.set(0),
+                    disabled: "{current_page() == 0}",
+                    "⏪"
+                }
+
+                // Previous Page (◀)
+                button {
+                    class: "w-9 h-9 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center disabled:opacity-50",
                     onclick: go_prev,
                     disabled: "{current_page() == 0}",
-                    "Previous"
+                    "◀"
                 }
-                span { "Page {current_page() + 1} of {total_pages}" }
+
+                // Next Page (▶)
                 button {
-                    class: "px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50",
+                    class: "w-9 h-9 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center disabled:opacity-50",
                     onclick: go_next,
                     disabled: "{current_page() + 1 >= total_pages}",
-                    "Next"
+                    "▶"
+                }
+
+                // Last Page (⏩)
+                button {
+                    class: "w-9 h-9 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center disabled:opacity-50",
+                    onclick: move |_| current_page.set(total_pages.saturating_sub(1)),
+                    disabled: "{current_page() + 1 >= total_pages}",
+                    "⏩"
+                }
+
+                // Page Indicator
+                span {
+                    class: "ml-2 text-gray-700 font-medium",
+                    "{page_info}"
                 }
             }
-            }
+        }
         }
     }
 }
