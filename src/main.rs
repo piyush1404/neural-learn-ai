@@ -16,6 +16,7 @@ use components::project_details::ProjectDetails;
 use components::top_bar::TopBar;
 use views::home_page::HomePage;
 use views::project_grid::ProjectGrid;
+
 fn main() {
     LaunchBuilder::new()
         .with_cfg(
@@ -36,7 +37,9 @@ fn App() -> Element {
             class: "w-full h-full bg-white font-sans px-7",
             // ChromeStyleNavbar {}
 
-            HomePage {}
+            // HomePage {}
+
+            ProjectDetails {}
 
         }
 
