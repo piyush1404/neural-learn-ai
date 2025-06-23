@@ -6,3 +6,8 @@ pub mod top_bar;
 
 pub mod collapsible_image;
 pub mod image_upload;
+
+pub mod learn;
+pub mod menu_bar;
+pub mod reco;
+pub mod setting;
