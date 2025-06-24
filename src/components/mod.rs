@@ -9,5 +9,5 @@ pub mod image_upload;
 
 pub mod learn;
 pub mod menu_bar;
-pub mod reco;
+pub mod recognize;
 pub mod setting;

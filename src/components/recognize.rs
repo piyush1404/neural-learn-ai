@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 #[component]
-pub fn Reco() -> Element {
+pub fn Recognize() -> Element {
     
     rsx! {
         div {
@@ -123,7 +123,7 @@ pub fn Reco() -> Element {
                 }
 
                 div {
-                    class: "flex justify-center items-center bg-white px-4 py-2 border-[#BEBEBE] rounded-lg",
+                    class: "flex justify-center items-center gap-2 bg-white px-4 py-2 border-[#BEBEBE] rounded-lg",
 
                     button {
                         class: "w-6 h-6 mr-2 bg-[#F7F7F7] text-[#CACACA] border border-[#EDEDED] rounded-full flex items-center justify-center",

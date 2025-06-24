@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 
 use crate::components::learn::Learn;
 use crate::components::menu_bar::MenuBar;
-use crate::components::reco::Reco;
+use crate::components::recognize::Recognize;
 use crate::components::setting::Setting;
 
 #[component]
@@ -11,7 +11,7 @@ pub fn ProjectDetails() -> Element {
         div {
             class: "flex mt-1",
 
-            // Left panel (Menu + Learn + Reco)
+            // Left panel (Menu + Learn + Recognize)
             div {
                 class: "h-full w-3/4 flex flex-col border-t border-b border-l border-[#BEBEBE] bg-[#FFFFFF] rounded-tl-[15px] rounded-bl-[15px]",
 
@@ -27,8 +27,8 @@ pub fn ProjectDetails() -> Element {
                         // Learn component
                         Learn {}
 
-                        // Recognize component
-                        Reco {}
+                        // Recognizegnize component
+                        Recognize {}
                     }
                 }
             }
