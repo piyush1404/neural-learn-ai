@@ -2,6 +2,7 @@ use dioxus::prelude::*;
 
 #[component]
 pub fn Reco() -> Element {
+    
     rsx! {
         div {
             class:"flex h-1/2 mx-6 my-5",
@@ -258,17 +259,14 @@ pub fn Reco() -> Element {
                 }
             }
             div {
-                class:"w-1/3  flex flex-col border-[0.5px] border-[#BEBEBE] bg-[#FAFAFA] rounded-tr-[10px] rounded-br-[10px]",
+                class: "w-1/3 flex flex-col border border-[#BEBEBE] bg-[#FAFAFA] rounded-tr-[10px] rounded-br-[10px]",
+            
+                // Header
                 div {
-                    class:"flex px-[14px] py-[10px] justify-between items-center",
-                    span {
-                        class:"font-normal text-sm text-[#404040]",
-                        "Learn Properties"
-                    }
+                    class: "flex justify-between items-center px-[14px] py-[10px]",
+                    span { class: "text-sm font-normal text-[#404040]", "Recognize Properties" }
                     button {
-                        class: "w-6 h-6 bg-[#FFFFFF] text-[#CACACA] border border-[#EDEDED] rounded-full flex items-center justify-center",
-                        // onclick: go_next,
-                        // disabled: "{current_page() + 1 >= total_pages}",
+                        class: "w-6 h-6 bg-white text-[#CACACA] border border-[#EDEDED] rounded-full flex items-center justify-center",
                         svg {
                             width: "6",
                             height: "10",
@@ -280,220 +278,119 @@ pub fn Reco() -> Element {
                                 fill: "#0387D9",
                             }
                         }
-
                     }
                 }
-
-                div {
-                    class:"px-[14px] py-[10px] flex gap-10",
+            
+                // Output Mode + Find Auto
+                div {   
+                    class: "flex items-center justify-between px-[14px] py-[10px]",
                     div {
-                        class:"flex px-2",
-                        span {
-                            class:"flex flex-col gap-[6px]",
-                            label {
-                                class:"font-normal text-[10px] text-[#8F8F8F]",
-                                "Learning Mode"
-                            }
-                            select {
-                                class: "
-                                   
-                                    px-3
-                                    pr-7
-                                    text-[11px]
-                                    font-normal
-                                    text-[#555555]
-                                    rounded
-                                    border border-[0.5px] border-[#BEBEBE]
-                                    appearance-none
-                                    bg-[url(\"data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.99997 5.70028C4.82075 5.70028 4.64155 5.63185 4.50492 5.49528L0.205141 1.19546C-0.0683804 0.921938 -0.0683804 0.478469 0.205141 0.205058C0.478552 -0.0683528 0.921933 -0.0683528 1.19548 0.205058L4.99997 4.00978L8.80449 0.205191C9.07801 -0.0682199 9.52135 -0.0682199 9.79474 0.205191C10.0684 0.478602 10.0684 0.922071 9.79474 1.19559L5.49503 5.49541C5.35832 5.63201 5.17913 5.70028 4.99997 5.70028Z' fill='%23555555'/%3E%3C/svg%3E\")]
-                                    bg-no-repeat
-                                    bg-[position:right_0.75rem_center]
-                                    bg-[length:10px_6px]
-                                ",
-                                option { value: "", disabled: true, selected: true, "Options" }
-                                option { value: "web", "Web" }
-                                option { value: "mobile", "Mobile" }
-                                option { value: "desktop", "Desktop" }
-                            }
+                        class: "flex px-2 flex-col gap-[6px]",
+                        label { class: "text-[10px] font-normal text-[#8F8F8F]", "Output Mode" }
+                        select {
+                            class: "
+                               
+                                px-3
+                                pr-7
+                                text-[11px]
+                                font-normal
+                                text-[#555555]
+                                rounded
+                                border border-[0.5px] border-[#BEBEBE]
+                                appearance-none
+                                bg-[url(\"data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.99997 5.70028C4.82075 5.70028 4.64155 5.63185 4.50492 5.49528L0.205141 1.19546C-0.0683804 0.921938 -0.0683804 0.478469 0.205141 0.205058C0.478552 -0.0683528 0.921933 -0.0683528 1.19548 0.205058L4.99997 4.00978L8.80449 0.205191C9.07801 -0.0682199 9.52135 -0.0682199 9.79474 0.205191C10.0684 0.478602 10.0684 0.922071 9.79474 1.19559L5.49503 5.49541C5.35832 5.63201 5.17913 5.70028 4.99997 5.70028Z' fill='%23555555'/%3E%3C/svg%3E\")]
+                                bg-no-repeat
+                                bg-[position:right_0.75rem_center]
+                                bg-[length:10px_6px]
+                            ",
+                            option { value: "", disabled: true, selected: true, "Options" }
+                            option { value: "web", "Web" }
+                            option { value: "mobile", "Mobile" }
+                            option { value: "desktop", "Desktop" }
                         }
-
                     }
                     div {
-                        class:"flex px-2",
-                        span {
-                            class:"flex flex-col gap-[6px]",
-                            label {
-                                class:"font-normal text-[10px] text-[#8F8F8F]",
-                                "Categories"
-                            }
-                            div {  
-                                class:"flex justify-end items-center gap-2",
-                                select {
-                                    class: "
-                                        
-                                        px-3
-                                        pr-7
-                                        text-[11px]
-                                        font-normal
-                                        text-[#555555]
-                                        rounded
-                                        border border-[0.5px] border-[#BEBEBE]
-                                        appearance-none
-                                        bg-[url(\"data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.99997 5.70028C4.82075 5.70028 4.64155 5.63185 4.50492 5.49528L0.205141 1.19546C-0.0683804 0.921938 -0.0683804 0.478469 0.205141 0.205058C0.478552 -0.0683528 0.921933 -0.0683528 1.19548 0.205058L4.99997 4.00978L8.80449 0.205191C9.07801 -0.0682199 9.52135 -0.0682199 9.79474 0.205191C10.0684 0.478602 10.0684 0.922071 9.79474 1.19559L5.49503 5.49541C5.35832 5.63201 5.17913 5.70028 4.99997 5.70028Z' fill='%23555555'/%3E%3C/svg%3E\")]
-                                        bg-no-repeat
-                                        bg-[position:right_0.75rem_center]
-                                        bg-[length:10px_6px]
-                                    ",
-                                    option { value: "", disabled: true, selected: true, "Options" }
-                                    option { value: "web", "Web" }
-                                    option { value: "mobile", "Mobile" }
-                                    option { value: "desktop", "Desktop" }
-                                }
-                                svg {
-                                    xmlns: "http://www.w3.org/2000/svg",
-                                    width: "19",
-                                    height: "19",
-                                    view_box: "0 0 19 19",
-                                    fill: "none",
-                                    rect {
-                                        x: "0.5",
-                                        y: "0.5",
-                                        width: "18",
-                                        height: "18",
-                                        rx: "3.5",
-                                        fill: "white",
-                                        stroke: "#0387D9"
-                                    }
-                                    path {
-                                        fill_rule: "evenodd",
-                                        clip_rule: "evenodd",
-                                        d: "M4 9.49998C4 9.87956 4.3079 10.1875 4.68748 10.1875H14.3125C14.6922 10.1875 15 9.87956 15 9.49998C15 9.1204 14.6922 8.8125 14.3125 8.8125H4.68763C4.3079 8.8125 4 9.1204 4 9.49998Z",
-                                        fill: "#0387D9"
-                                    }
-                                    path {
-                                        fill_rule: "evenodd",
-                                        clip_rule: "evenodd",
-                                        d: "M9.50002 15C9.8796 15 10.1875 14.6921 10.1875 14.3125V4.68748C10.1875 4.30776 9.8796 4 9.50002 4C9.12044 4 8.81254 4.30776 8.81254 4.68748V14.3124C8.81254 14.6921 9.12044 15 9.50002 15Z",
-                                        fill: "#0387D9"
-                                    }
-                                }
-                            }
-                        }
+                        class: "flex items-center gap-4 mt-4",
+                        label { class: "text-sm text-[#313131]", "Find Auto" }
+                        input { type: "checkbox", class: "w-4 h-4 accent-[#0387D9] border border-[#0387D9] rounded" }
                     }
                 }
-
+            
+                // Step XY and Skip XY
                 div {
-                    class:"px-[14px] py-[10px] flex",
+                    class: "flex justify-between gap-4 px-[14px] py-[10px]",
+                    // Step XY
                     div {
-                        class:"flex flex-col px-2 gap-[6px]",
-                        label {
-                            class:"font-normal text-[10px] text-[#8F8F8F]",
-                            "Step XY (px)"
-                        }
-                        span {
-                            class:"flex justify-between items-center gap-1",
+                        class: "flex px-2 flex-col gap-[6px]",
+                        label { class: "text-[10px] font-normal text-[#8F8F8F]", "Step XY (px)" }
+                        div {
+                            class: "flex gap-2",
                             input {
-                                r#type: "number",
-                                class: "p-1 border bg-[#EAEAEA] rounded font-normal text-xs text-[#313131] appearance-none",
-                                style: r#"
-                                    background-image: url("data:image/svg+xml,%3Csvg width='10' height='20' viewBox='0 0 10 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.433751 14.1396L4.5221 18.7834C4.588 18.8582 4.66975 18.9183 4.76173 18.9595C4.85372 19.0006 4.95376 19.0219 5.05501 19.0219C5.15625 19.0219 5.2563 19.0006 5.34828 18.9595C5.44027 18.9183 5.52201 18.8582 5.58791 18.7834L9.67626 14.1396C10.0664 13.6964 9.74295 13.0117 9.14336 13.0117L0.965488 13.0117C0.365895 13.0117 0.0424066 13.6964 0.433751 14.1396Z' fill='%23888888'/%3E%3Cpath d='M0.433751 4.8838L4.5221 0.240016C4.588 0.165204 4.66975 0.105152 4.76173 0.0639811C4.85372 0.0228095 4.95376 0.0014925 5.05501 0.0014925C5.15625 0.0014925 5.2563 0.0228095 5.34828 0.0639811C5.44027 0.105152 5.52201 0.165204 5.58791 0.240016L9.67626 4.8838C10.0664 5.32705 9.74295 6.01172 9.14336 6.01172L0.965488 6.01172C0.365895 6.01172 0.0424066 5.32705 0.433751 4.8838Z' fill='%23888888'/%3E%3C/svg%3E");
-                                    background-repeat: no-repeat;
-                                    background-position: right 10px center;
-                                    background-size: 10px 20px;
-                                "#,
-                                min: "16",
-                                max: "256",
-                                value:16,
+                                type: "number", value: "16", min: "16", max: "256",
+                                class: "p-1 w-[53px] text-xs text-[#313131] font-normal bg-[#EAEAEA] border rounded appearance-none"
                             }
                             input {
-                                r#type: "number",
-                                class: "p-1 border bg-[#EAEAEA] rounded font-normal text-xs text-[#313131] appearance-none",
-                                style: r#"
-                                    background-image: url("data:image/svg+xml,%3Csvg width='10' height='20' viewBox='0 0 10 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.433751 14.1396L4.5221 18.7834C4.588 18.8582 4.66975 18.9183 4.76173 18.9595C4.85372 19.0006 4.95376 19.0219 5.05501 19.0219C5.15625 19.0219 5.2563 19.0006 5.34828 18.9595C5.44027 18.9183 5.52201 18.8582 5.58791 18.7834L9.67626 14.1396C10.0664 13.6964 9.74295 13.0117 9.14336 13.0117L0.965488 13.0117C0.365895 13.0117 0.0424066 13.6964 0.433751 14.1396Z' fill='%23888888'/%3E%3Cpath d='M0.433751 4.8838L4.5221 0.240016C4.588 0.165204 4.66975 0.105152 4.76173 0.0639811C4.85372 0.0228095 4.95376 0.0014925 5.05501 0.0014925C5.15625 0.0014925 5.2563 0.0228095 5.34828 0.0639811C5.44027 0.105152 5.52201 0.165204 5.58791 0.240016L9.67626 4.8838C10.0664 5.32705 9.74295 6.01172 9.14336 6.01172L0.965488 6.01172C0.365895 6.01172 0.0424066 5.32705 0.433751 4.8838Z' fill='%23888888'/%3E%3C/svg%3E");
-                                    background-repeat: no-repeat;
-                                    background-position: right 10px center;
-                                    background-size: 10px 20px;
-                                "#,
-                                min: "16",
-                                max: "256",
-                                value: 16,
+                                type: "number", value: "16", min: "16", max: "256",
+                                class: "p-1 w-[53px] text-xs text-[#313131] font-normal bg-[#EAEAEA] border rounded appearance-none"
                             }
                         }
                     }
-
-                    div {  
-                        class:"w-full mt-4 flex flex-col justify-end items-center p-2 gap-2",
-                        span { 
-                            class:"flex font-normal text-[10px] text-[#8F8F8F]", "Skip XY" }
-                            div {
-                                class: "flex gap-2 justify-center items-center",
-                            div {
-                                class: "flex gap-2 items-center",
-                                span { class: "font-normal text-xs text-[#313131]", "X" }
-                                input {
-                                    r#type: "checkbox",
-                                    class: "w-4 h-4 accent-[#0387D9] border rounded border-[#0387D9]"
-                                }
-                            }
-                            div {
-                                class: "flex gap-2 items-center",
-                                span { class: "font-normal text-xs text-[#313131]", "Y" }
-                                input {
-                                    r#type: "checkbox",
-                                    class: "w-4 h-4 accent-[#0387D9] border rounded border-[#0387D9]"
-                                }
-                            }
-                        }
-                    
-
-                    }
-                }
-
-                hr { class: "border-t-[0.5px] border-[#DADADA] my-1 w-full" }
-
-                div {
-                    class:"px-[14px] py-[10px] flex",
-                    div {  
-                        class:"w-full flex justify-end items-center px-2 gap-2",
-                        label {  
-                            class:"font-normal text-sm text-[#313131]",
-                            "Full Image"
-                        }
-                        input {
-                            r#type: "checkbox",
-                            class: "w-4 h-4 accent-[#0387D9] border rounded border-[#0387D9]"
-                        }
-    
-                    }
-                }
-
-                hr { class: "border-t-[0.5px] border-[#DADADA] my-1 w-full" }
-
-                 // Show Radio Buttons
-                 div {
-                    class: "flex flex-col gap-1",
-                    span { class: "px-[14px] py-[10px] flex text-[10px] font-normal text-[#8F8F8F]", "Show" }
+            
+                    // Skip XY
                     div {
-                        class: "flex justify-around items-center font-normal text-sm text-[#313131]",
+                        class: "flex flex-col gap-3",
+                        label { class: "text-[10px] font-normal text-[#8F8F8F]", "Skip XY" }
+                        div {
+                            class: "flex gap-8",
+                            div {
+                                class: "flex items-center gap-2",
+                                span { class: "text-xs text-[#313131]", "X" }
+                                input { type: "checkbox", class: "w-4 h-4 accent-[#0387D9] border border-[#0387D9] rounded" }
+                            }
+                            div {
+                                class: "flex items-center gap-2",
+                                span { class: "text-xs text-[#313131]", "Y" }
+                                input { type: "checkbox", class: "w-4 h-4 accent-[#0387D9] border border-[#0387D9] rounded" }
+                            }
+                        }
+                    }
+                }
+            
+                hr { class: "border-t border-[#DADADA] my-1 w-full" }
+            
+                // Full Image toggle
+                div {
+                    class: "flex justify-end items-center px-[14px] py-[10px] gap-3",
+                    label { class: "text-sm text-[#313131]", "Full Image" }
+                    input { type: "checkbox", class: "w-4 h-4 accent-[#0387D9] border border-[#0387D9] rounded" }
+                }
+            
+                hr { class: "border-t border-[#DADADA] my-1 w-full" }
+            
+                // Show Radio Buttons
+                div {
+                    class: "px-[16px] py-[10px] flex flex-col gap-1",
+                    span { class: " flex text-[10px] font-normal text-[#8F8F8F]", "Show" }
+                    div {
+                        class: "flex justify-between items-center font-normal text-sm text-[#313131]",
                         label {
-                            class: "flex items-center gap-1 text-xs",
-                            input { r#type: "radio", name: "show", class: "accent-[#0387D9]" }
+                            class: "flex items-center gap-2 text-xs",
                             span { "Center" }
-                        }
-                        label {
-                            class: "flex items-center gap-1 text-xs",
-                            input { r#type: "radio", name: "show", checked: true, class: "accent-[#0387D9]" }
-                            span { "Box" }
-                        }
-                        label {
-                            class: "flex items-center gap-1 text-xs",
                             input { r#type: "radio", name: "show", class: "accent-[#0387D9]" }
+                        }
+                        label {
+                            class: "flex items-center gap-2 text-xs",
+                            span { "Box" }
+                            input { r#type: "radio", name: "show", checked: true, class: "accent-[#0387D9]" }
+                        }
+                        label {
+                            class: "flex items-center gap-2 text-xs",
                             span { "Shade" }
+                            input { r#type: "radio", name: "show", class: "accent-[#0387D9]" }
                         }
                     }
                 }
-
-            }
+            }        
         }
     }
 }

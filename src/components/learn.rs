@@ -260,17 +260,13 @@ pub fn Learn() -> Element {
 
             }
             div {
-                class:"w-1/3  flex flex-col border-[0.5px] border-[#BEBEBE] bg-[#FAFAFA] rounded-tr-[10px] rounded-br-[10px]",
+                class: "w-1/3 flex flex-col border-[0.5px] border-[#BEBEBE] bg-[#FAFAFA] rounded-tr-[10px] rounded-br-[10px]",
+                // Header
                 div {
-                    class:"flex px-[14px] py-[10px] justify-between items-center",
-                    span {
-                        class:"font-normal text-sm text-[#404040]",
-                        "Learn Properties"
-                    }
+                    class: "flex justify-between items-center px-[14px] py-[10px]",
+                    span { class: "font-normal text-sm text-[#404040]", "Learn Properties" },
                     button {
-                        class: "w-6 h-6 bg-[#FFFFFF] text-[#CACACA] border border-[#EDEDED] rounded-full flex items-center justify-center",
-                        // onclick: go_next,
-                        // disabled: "{current_page() + 1 >= total_pages}",
+                        class: "w-6 h-6 bg-white text-[#CACACA] border border-[#EDEDED] rounded-full flex items-center justify-center",
                         svg {
                             width: "6",
                             height: "10",
@@ -282,20 +278,18 @@ pub fn Learn() -> Element {
                                 fill: "#0387D9",
                             }
                         }
-
                     }
                 }
-
+    
+                // Mode & Category
                 div {
-                    class:"px-[14px] py-[10px] flex gap-10",
+                    class: "px-[14px] py-[10px] flex gap-10",
+                    // Learning Mode
                     div {
-                        class:"flex px-2",
+                        class: "flex px-2",
                         span {
-                            class:"flex flex-col gap-[6px]",
-                            label {
-                                class:"font-normal text-[10px] text-[#8F8F8F]",
-                                "Learning Mode"
-                            }
+                            class: "flex flex-col gap-[6px]",
+                            label { class: "font-normal text-[10px] text-[#8F8F8F]", "Learning Mode" },
                             select {
                                 class: "
                                    
@@ -318,21 +312,19 @@ pub fn Learn() -> Element {
                                 option { value: "desktop", "Desktop" }
                             }
                         }
-
                     }
+    
+                    // Categories
                     div {
-                        class:"flex px-2",
+                        class: "flex",
                         span {
-                            class:"flex flex-col gap-[6px]",
-                            label {
-                                class:"font-normal text-[10px] text-[#8F8F8F]",
-                                "Categories"
-                            }
-                            div {  
-                                class:"flex justify-end items-center gap-2",
+                            class: "flex flex-col justify-end gap-[6px]",
+                            label { class: "font-normal text-[10px] text-[#8F8F8F]", "Categories" },
+                            div {
+                                class: "flex items-center gap-2",
                                 select {
                                     class: "
-                                        
+                                       
                                         px-3
                                         pr-7
                                         text-[11px]
@@ -350,7 +342,7 @@ pub fn Learn() -> Element {
                                     option { value: "web", "Web" }
                                     option { value: "mobile", "Mobile" }
                                     option { value: "desktop", "Desktop" }
-                                }
+                                },
                                 svg {
                                     xmlns: "http://www.w3.org/2000/svg",
                                     width: "19",
@@ -385,61 +377,36 @@ pub fn Learn() -> Element {
                 }
 
                 div {
-                    class:"px-[14px] py-[10px] flex",
+                    class: "px-[14px] py-[10px] flex",
                     div {
-                        class:"flex flex-col px-2 gap-[6px]",
-                        label {
-                            class:"font-normal text-[10px] text-[#8F8F8F]",
-                            "Step XY (px)"
-                        }
+                        class: "flex flex-col px-2 gap-[6px]",
+                        label { class: "font-normal text-[10px] text-[#8F8F8F]", "Step XY (px)" },
                         span {
-                            class:"flex justify-between items-center gap-1",
+                            class: "flex gap-1",
                             input {
                                 r#type: "number",
-                                class: "p-1 border bg-[#EAEAEA] rounded font-normal text-xs text-[#313131] appearance-none",
-                                style: r#"
-                                    background-image: url("data:image/svg+xml,%3Csvg width='10' height='20' viewBox='0 0 10 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.433751 14.1396L4.5221 18.7834C4.588 18.8582 4.66975 18.9183 4.76173 18.9595C4.85372 19.0006 4.95376 19.0219 5.05501 19.0219C5.15625 19.0219 5.2563 19.0006 5.34828 18.9595C5.44027 18.9183 5.52201 18.8582 5.58791 18.7834L9.67626 14.1396C10.0664 13.6964 9.74295 13.0117 9.14336 13.0117L0.965488 13.0117C0.365895 13.0117 0.0424066 13.6964 0.433751 14.1396Z' fill='%23888888'/%3E%3Cpath d='M0.433751 4.8838L4.5221 0.240016C4.588 0.165204 4.66975 0.105152 4.76173 0.0639811C4.85372 0.0228095 4.95376 0.0014925 5.05501 0.0014925C5.15625 0.0014925 5.2563 0.0228095 5.34828 0.0639811C5.44027 0.105152 5.52201 0.165204 5.58791 0.240016L9.67626 4.8838C10.0664 5.32705 9.74295 6.01172 9.14336 6.01172L0.965488 6.01172C0.365895 6.01172 0.0424066 5.32705 0.433751 4.8838Z' fill='%23888888'/%3E%3C/svg%3E");
-                                    background-repeat: no-repeat;
-                                    background-position: right 10px center;
-                                    background-size: 10px 20px;
-                                "#,
-                                min: "16",
-                                max: "256",
-                                value:16,
-                            }
+                                min: "16", max: "256", value: "16",
+                                class: "p-1 w-[53px] border bg-[#EAEAEA] rounded font-normal text-xs text-[#313131] appearance-none"
+                            },
                             input {
                                 r#type: "number",
-                                class: "p-1 border bg-[#EAEAEA] rounded font-normal text-xs text-[#313131] appearance-none",
-                                style: r#"
-                                    background-image: url("data:image/svg+xml,%3Csvg width='10' height='20' viewBox='0 0 10 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.433751 14.1396L4.5221 18.7834C4.588 18.8582 4.66975 18.9183 4.76173 18.9595C4.85372 19.0006 4.95376 19.0219 5.05501 19.0219C5.15625 19.0219 5.2563 19.0006 5.34828 18.9595C5.44027 18.9183 5.52201 18.8582 5.58791 18.7834L9.67626 14.1396C10.0664 13.6964 9.74295 13.0117 9.14336 13.0117L0.965488 13.0117C0.365895 13.0117 0.0424066 13.6964 0.433751 14.1396Z' fill='%23888888'/%3E%3Cpath d='M0.433751 4.8838L4.5221 0.240016C4.588 0.165204 4.66975 0.105152 4.76173 0.0639811C4.85372 0.0228095 4.95376 0.0014925 5.05501 0.0014925C5.15625 0.0014925 5.2563 0.0228095 5.34828 0.0639811C5.44027 0.105152 5.52201 0.165204 5.58791 0.240016L9.67626 4.8838C10.0664 5.32705 9.74295 6.01172 9.14336 6.01172L0.965488 6.01172C0.365895 6.01172 0.0424066 5.32705 0.433751 4.8838Z' fill='%23888888'/%3E%3C/svg%3E");
-                                    background-repeat: no-repeat;
-                                    background-position: right 10px center;
-                                    background-size: 10px 20px;
-                                "#,
-                                min: "16",
-                                max: "256",
-                                value: 16,
+                                min: "16", max: "256", value: "16",
+                                class: "p-1 w-[53px] border bg-[#EAEAEA] rounded font-normal text-xs text-[#313131] appearance-none"
                             }
                         }
                     }
-
-                    div {  
-                        class:"w-full mt-4 flex justify-end items-center p-2 gap-2",
-                        label {  
-                            class:"font-normal text-sm text-[#313131]",
-                            "Learn Auto"
-                        }
-                        input {  
-                            r#type:"checkbox",
-                            class:"w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600",
-                        }
+    
+                    div {
+                        class: "w-full mt-4 flex justify-end items-center p-2 gap-2",
+                        label { class: "text-sm text-[#313131]", "Full Image" }
+                        input { type: "checkbox", class: "w-4 h-4 accent-[#0387D9] border border-[#0387D9] rounded" }
                     }
                 }
-
+    
                 hr { class: "border-t-[0.5px] border-[#DADADA] my-1 w-full" }
-
-                button {  
-                    class:"mx-4 my-2 flex p-[6px] justify-center items-center gap-2 bg-[#0387D9] text-[#FFFFFF] text-xs font-medium rounded-2xl",
+    
+                button {
+                    class: "mx-4 my-2 p-[6px] flex justify-center items-center gap-2 bg-[#0387D9] text-white text-xs font-medium rounded-2xl",
                     "Select Full Image"
                 }
             }
