@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 pub fn Setting() -> Element {
     rsx! {
         div {
-            class:"flex gap-2 bg-[#CAEAD7] px-[30px] py-[10px] rounded-[10px] ",
+            class:"flex gap-2 bg-[#CAEAD7] mx-[13px] my-[14px] px-[30px] py-[10px] rounded-[10px] ",
             span {
                 svg {
                     width: "14",
@@ -39,7 +39,7 @@ pub fn Setting() -> Element {
         }
 
         div {
-            class:"flex flex-col mt-12 gap-2 items-center cursor-pointer",
+            class:"flex flex-col mx-[13px] my-[14px] gap-2 items-center cursor-pointer",
             div {
                 class:"w-full flex justify-between items-center gap-2 text-xs font-normal",
                 span {
@@ -97,10 +97,10 @@ pub fn Setting() -> Element {
             }
         }
 
-        hr { class: "border-t-[0.5px] border-[#BEBEBE] m-3" }
+        hr { class: "border-t-[0.5px] border-[#BEBEBE]" }
 
         div {
-            class:"flex flex-col gap-2 items-start",
+            class:"px-[13px] py-[14px] flex flex-col gap-2 items-start",
 
             span {
                 class:"font-normal text-sm text-[#404040]",
@@ -114,7 +114,7 @@ pub fn Setting() -> Element {
                     "Platform"
                 }
                 select {
-                    class: "min-w-full px-[10px] py-1 border-[0.5px] border-[#DEDEDE] rounded-md font-normal text-xs text-[#313131] appearance-none pr-8",
+                    class: " px-[10px] py-1 border-[0.5px] border-[#DEDEDE] rounded-md font-normal text-xs text-[#313131] appearance-none pr-8",
                     style: r#"
                     color: #555555;
                     background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.99997 5.70028C4.82075 5.70028 4.64155 5.63185 4.50492 5.49528L0.205141 1.19546C-0.0683804 0.921938 -0.0683804 0.478469 0.205141 0.205058C0.478552 -0.0683528 0.921933 -0.0683528 1.19548 0.205058L4.99997 4.00978L8.80449 0.205191C9.07801 -0.0682199 9.52135 -0.0682199 9.79474 0.205191C10.0684 0.478602 10.0684 0.922071 9.79474 1.19559L5.49503 5.49541C5.35832 5.63201 5.17913 5.70028 4.99997 5.70028Z' fill='%23555555'/%3E%3C/svg%3E");
@@ -130,26 +130,24 @@ pub fn Setting() -> Element {
             }
 
             span {
-                class:"flex flex-col items-start gap-2",
+                class: "flex flex-col items-start gap-2 w-full",
                 label {
-                    "class": "font-normal text-[10px] text-[#555555]",
+                    class: "font-normal text-[10px] text-[#555555]",
                     "Image file ROI"
                 }
-
                 div {
-                    class:"flex items-center gap-2",
+                    class: "flex items-center justify-between w-full",
                     input {
-                        r#type:"number",
-                        class:"px-[10px] py-1 w-1/2 border bg-[#EAEAEA] rounded font-normal text-xs text-[#313131]",
+                        r#type: "number",
+                        class: "w-1/3 px-[10px] py-1 border bg-[#EAEAEA] rounded font-normal text-xs text-[#313131]",
                     }
-
                     input {
-                        r#type:"number",
-                        class:"px-[10px] py-1 w-1/2 border bg-[#EAEAEA] rounded font-normal text-xs text-[#313131]",
+                        r#type: "number",
+                        class: "w-1/3 px-[10px] py-1 border bg-[#EAEAEA] rounded font-normal text-xs text-[#313131]",
                     }
                 }
             }
-
+            
             span {
                 class:"flex flex-col items-start gap-2",
                 label {
@@ -173,70 +171,64 @@ pub fn Setting() -> Element {
             }
 
             span {
-                class:"flex flex items-start gap-2",
+                class: "flex items-center justify-between w-full gap-2",
                 span {
-                    class:"flex flex-col items-start gap-2",
+                    class: "flex flex-col items-start gap-1",
                     label {
-                        "class": "font-normal text-[10px] text-[#555555]",
+                        class: "font-normal text-[10px] text-[#555555]",
                         "Block width"
                     }
                     input {
-                        r#type:"number",
-                        class:"px-[10px] py-1 w-1/2 border bg-[#EAEAEA] rounded font-normal text-xs text-[#313131]",
+                        r#type: "number",
+                        class: "w-1/2 px-[10px] py-1 border bg-[#EAEAEA] rounded font-normal text-xs text-[#313131]",
                     }
-
                 }
-
                 span {
-                    class:"flex flex-col items-start gap-2",
+                    class: "flex flex-col gap-1",
                     label {
-                        "class": "font-normal text-[10px] text-[#555555]",
+                        class: "font-normal text-[10px] text-[#555555]",
                         "Block height"
                     }
                     input {
-                        r#type:"number",
-                        class:"px-[10px] py-1 w-1/2 border bg-[#EAEAEA] rounded font-normal text-xs text-[#313131]",
+                        r#type: "number",
+                        class: "w-1/2 px-[10px] py-1 border bg-[#EAEAEA] rounded font-normal text-xs text-[#313131]",
                     }
-
                 }
             }
-
+            
             span {
                 "class": "font-normal text-[10px] text-[#555555]",
                 "Influence Field Range "
             }
 
             span {
-                class:"flex flex items-start gap-2",
+                class: "flex items-center justify-between w-full gap-2",
                 span {
-                    class:"flex flex-col items-start gap-2",
+                    class: "flex flex-col items-start gap-1",
                     label {
-                        "class": "font-normal text-[10px] text-[#555555]",
+                        class: "font-normal text-[10px] text-[#555555]",
                         "Max"
                     }
                     input {
-                        r#type:"number",
-                        class:"px-[10px] py-1 w-1/2 border bg-[#EAEAEA] rounded font-normal text-xs text-[#313131]",
+                        r#type: "number",
+                        class: "w-1/2 px-[10px] py-1 border bg-[#EAEAEA] rounded font-normal text-xs text-[#313131]",
                     }
-
                 }
-
                 span {
-                    class:"flex flex-col items-start gap-2",
+                    class: "flex flex-col gap-1",
                     label {
-                        "class": "font-normal text-[10px] text-[#555555]",
+                        class: "font-normal text-[10px] text-[#555555]",
                         "Min"
                     }
                     input {
-                        r#type:"number",
-                        class:"px-[10px] py-1 w-1/2 border bg-[#EAEAEA] rounded font-normal text-xs text-[#313131]",
+                        r#type: "number",
+                        class: "w-1/2 px-[10px] py-1 border bg-[#EAEAEA] rounded font-normal text-xs text-[#313131]",
                     }
-
                 }
             }
-
+            
             span {
-                class:"w-full felx flex justify-between items-center gap-2",
+                class:"w-full mt-2 felx flex justify-between items-center gap-2",
                 button {
                     class: "px-4 py-1 rounded-[50px] border-[0.5px] border-[#DEDEDE] bg-[#FFFFFF] font-normal text-[11px] text-[#151515]",
                     "Suggest"
@@ -247,7 +239,6 @@ pub fn Setting() -> Element {
                     "Validate"
                 }
             }
-
         }
     }
 }

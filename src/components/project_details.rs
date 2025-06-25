@@ -35,7 +35,7 @@ pub fn ProjectDetails() -> Element {
 
             // Right panel (Settings)
             div {
-                class: "p-3 min-h-full w-1/4 px-[13px] py-[14px] border-[0.5px] border-[#BEBEBE] bg-[#FAFAFA] rounded-tr-[15px] rounded-br-[15px] flex flex-col gap-2",
+                class: "w-1/4 border-[0.5px] border-[#BEBEBE] bg-[#FAFAFA] rounded-tr-[15px] rounded-br-[15px] flex flex-col gap-2",
 
                 // Setting component
                 Setting {}

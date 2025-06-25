@@ -1,4 +1,4 @@
-use dioxus::{html::geometry::euclid::default, prelude::*};
+use dioxus:: prelude::*;
 
 #[component]
 pub fn Learn() -> Element {

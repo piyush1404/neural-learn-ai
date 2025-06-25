@@ -2,7 +2,6 @@ use dioxus::prelude::*;
 
 #[component]
 pub fn Recognize() -> Element {
-    
     rsx! {
         div {
             class:"flex h-1/2 mx-6 my-5",
