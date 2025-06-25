@@ -6,50 +6,41 @@ pub fn NewProjectCard() -> Element {
     let mut show_advanced = use_signal(|| false);
 
     let mut categories = use_signal(|| vec![
-        ("Background".to_string(), "bg-neutral-800".to_string()),
-        ("Object".to_string(), "bg-red-600".to_string())
+        ("Background".to_string(), "bg-[#4C4C4C]".to_string()),
+        ("Object".to_string(), "bg-[#F85858]".to_string())
     ]);
 
     let default_categories = vec![
-        ("Background".to_string(), "bg-neutral-800".to_string()),
-        ("Object".to_string(), "bg-red-600".to_string()),
+        ("Background".to_string(), "bg-[#4C4C4C]".to_string()),
+        ("Object".to_string(), "bg-[#F85858]".to_string()),
     ];
 
-    let mut description = use_signal(|| "".to_string());
+    let mut description = use_signal(|| "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.".to_string());
 
     rsx! {
-        
         div {
             class: "border border-[#BEBEBE] rounded-xl shadow-sm flex flex-col items-center justify-center gap-2 cursor-pointer",
             onclick: move |_| show_modal.set(true),
-
-            // Dashed box with "+"
             div {
                 class: "w-20 h-20 border-2 border-dashed border-[#999999] flex items-center justify-center text-[#0387D9] text-xl rounded-sm",
                 "+"
             }
-
-            // Label text
             span {
                 class: "text-[#0387D9] text-sm font-medium",
                 "New Project"
             }
         }
-
         if *show_modal.read() {
             div {
                 class: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50",
-                div{
                 div {
-                    class: "bg-white w-[811px] rounded-[10px] overflow-hidden shadow-lg max-h-[580px] flex flex-col text-[13px]",
-
+                    class: "bg-[#FFFFFF] rounded-[10px] overflow-hidden shadow-lg max-h-[580px] flex flex-col",
                     div {
-                        class: "flex justify-between items-center px-6 py-4 border-b h-[42px]",
-                        h2 { class: "text-sm font-normal text-[#404040]", "Project Details" }
-                        button {
-                            class: "text-gray-400 hover:text-black text-xl",
+                        class: "flex justify-between items-center px-5 py-2 border-b h-[42px]",
+                        span { class: "text-sm font-normal text-[#404040]", "Project Details" }
+                        button {    
+                            class: " hover:text-black",
                             onclick: move |_| show_modal.set(false),
-                            // "×"
                             svg {
                                 width: "811",
                                 height: "42",
@@ -72,23 +63,21 @@ pub fn NewProjectCard() -> Element {
                             }
                         }
                     }
-
-                  div {  
-                    class:"bg-[#EFEFEF] h-[158px]",
-                    div {
-                        class: "px-6 pt-4 grid grid-cols-3 gap-4",
+                    div {  
+                        class:"bg-[#EFEFEF] px-5 pb-5 pt-[10px] ",
+                        div {
+                            class: "grid grid-cols-3 gap-4",
                         div {
                             label { class: "block mb-1 font-normal text-xs text-[#404040]", "Project Name" }
                             input {
-                                class: "w-full border rounded px-3 py-1 h-[30px] outline-blue-500",
+                                class: "w-full border-[0.5px] border-[#8F8F8F] rounded px-4 py-1 font-normal text-xs text-[#313131",
                                 value: {"Sensor clip"},
-                               
                             }
                         }
                         div {
                             label { class: "block mb-1 text-xs font-normal text-[#4D4D4D]", "Select Platform" }
                             select {
-                                class: "w-full border rounded px-3 py-1 h-[30px] outline-blue-500",
+                                class: "w-full border-[0.5px] border-[#8F8F8F] rounded px-4 py-1 font-normal text-xs text-[#313131",
                                 option { "Simulation" }
                                 option { "Real-Time" }
                             }
@@ -96,34 +85,31 @@ pub fn NewProjectCard() -> Element {
                         div {
                             label { class: "block mb-1 text-xs font-normal text-[#4D4D4D]", "Project Type" }
                             select {
-                                class: "w-full border rounded px-3 py-1 h-[30px] outline-blue-500",
+                                class: "w-full border-[0.5px] border-[#8F8F8F] rounded px-4 py-1 font-normal text-xs text-[#313131",
                                 option { "Image" }
                                 option { "Video" }
                             }
                         }
                     }
-
                     div {
-                        class: "col-span-3 px-6 mt-2",
+                        class: "col-span-3 mt-[10pxs]",
                         div {
                             class: "flex justify-between items-center bg-[#EFEFEF] mb-1 text-xs text-[#404040]",
                             span { "Description" }
                             span { "{description.read().len()}/100 alphabets" }
                         }
                         textarea {
-                            class: "border rounded font-poppins font-normal w-[771px] p-2 text-xs h-[46px] resize-none bg-white appearance-none outline-none",
+                            class: "w-full border border-[#8F8F8F] rounded font-poppins font-normal px-4 py-1 text-xs text-[#313131] resize-none bg-[#FFFFFF] appearance-none outline-none",
                             maxlength: "100",
                             value: "{description}",
                             oninput: move |e| description.set(e.value().clone())
                         }
-                    }
-
-                   
-                  } 
-                  div {
-                        class: "text-center my-2",
+                    } 
+                   } 
+                    div {
+                        class: "text-center bg-[#FAFAFA] py-[13px]",
                         button {
-                            class: "bg-[#0D99FF] text-[#FFFFFF] font-normal text-xs rounded-full w-[84px] h-[26px] text-center",
+                            class: "px-[10px] py-1 bg-[#0387D9] text-[#FFFFFF] font-normal text-xs rounded-[13px] text-center",
                             onclick: move |_| {
                                 let current = *show_advanced.read();
                                 show_advanced.set(!current);
@@ -131,33 +117,29 @@ pub fn NewProjectCard() -> Element {
                             "Advance " { if *show_advanced.read() { "-" } else { "+" } }
                         }
                     }
-
                     if *show_advanced.read() {
                         div {
-                            class: "flex px-6 gap-4 pb-4 border-t h-[266px]",
+                            class: "flex px-5 gap-4 border border-[#DDDDDD] bg-[#FAFAFA]",
                     
-                            // Categories (w-3/12)
+                            // Categories Panel
                             div {
-                                class: "pt-4 border-r w-[22%] flex flex-col justify-between h-[266px]",
+                                class: "pt-3 border-r w-[22%] flex flex-col justify-between h-[266px]",
                                 div {
                                     class: "relative mb-2 space-y-2 h-[266px]",
-                                
-                                    // Header
+                    
                                     span { class: "block mb-2 text-xs text-[#404040] font-normal", "Categories" }
-                                
+                    
                                     div {
-                                        class: "flex items-center gap-2 text-xs mb-1",
-                                        span {class:"w-[91px] text-[10px] h-[15px] rounded" ,"Name" }
-                                        span {class:"w-[28px] text-[10px] h-[15px]", "Color" }
-                                        span {} // For buttons column
+                                        class: "flex items-center gap-2 text-xs text-[#404040] mb-1",
+                                        span { class: "w-[91px] text-[10px] h-[15px] rounded", "Name" }
+                                        span { class: "w-[28px] text-[10px] h-[15px]", "Color" }
+                                        span {}
                                     }
-                                
-                                    // Rows
+                    
                                     for (index, (name, color)) in categories.read().iter().cloned().enumerate() {
                                         div {
                                             class: "flex items-center gap-2",
-                                
-                                            // Name Input
+                    
                                             input {
                                                 class: "border p-1 w-[91px] rounded text-sm h-[20px]",
                                                 value: "{name}",
@@ -167,20 +149,14 @@ pub fn NewProjectCard() -> Element {
                                                     categories.set(updated);
                                                 }
                                             }
-                                
-                                            // Color box
+                    
                                             div {
-                                                class: "",
                                                 div {
                                                     class: format_args!("w-[28px] h-[20px] rounded border border-gray-300 {}", color),
                                                 }
                                             }
-                                
-                                            // Button
-                                            div {
-                                                class: "",
                     
-                                                // Remove (×)
+                                            div {
                                                 if categories.read().len() > 1 && index != categories.read().len() - 1 {
                                                     button {
                                                         class: "w-[19px] h-[19px] rounded-sm border border-red-300 text-red-500 text-sm flex items-center justify-center",
@@ -192,8 +168,6 @@ pub fn NewProjectCard() -> Element {
                                                         "×"
                                                     }
                                                 }
-                    
-                                                // Add (+)
                                                 if index == categories.read().len() - 1 {
                                                     button {
                                                         class: "w-[19px] h-[19px] rounded-sm border border-blue-300 text-blue-500 text-sm flex items-center justify-center",
@@ -208,12 +182,11 @@ pub fn NewProjectCard() -> Element {
                                             }
                                         }
                                     }
-                                
-                                    // Reset Button
+                    
                                     div {
                                         class: "absolute bottom-[20px] right-[10px]",
                                         button {
-                                            class: "bg-blue-500 text-white px-4 py-1 rounded-full text-sm",
+                                            class: "bg-[#0387D9] text-[#FFFFFF] px-4 py-1 rounded-[13px] text-sm",
                                             onclick: move |_| {
                                                 categories.set(vec![
                                                     ("Background".to_string(), "bg-zinc-800".to_string()),
@@ -226,14 +199,13 @@ pub fn NewProjectCard() -> Element {
                                 }
                             }
                     
-                            // Context (w-2/12)
+                            // Context Panel
                             div {
-                                class: "pt-4 border-r w-[22%]",
-                                span { class: "block mb-2 text-xs font-normal", "Context" }
+                                class: "pt-3 border-r w-[22%]",
+                                span { class: "block mb-2 text-xs text-[#404040] font-normal", "Context" }
                                 div {
                                     class: "space-y-1",
                                     span { class: "block mb-2 text-[10px] font-normal", "Context" }
-                                    
                                     div {
                                         class: "flex items-center gap-1",
                                         button {
@@ -241,7 +213,7 @@ pub fn NewProjectCard() -> Element {
                                             "+"
                                         }
                                         div {
-                                            class: "px-2 py-1 text-xs text-gray-700 bg-white border rounded",
+                                            class: "px-2 py-1 text-[11px] text-[#40404080] bg-[#FFFFFF] border-[0.5px] border-[#8F8F8F] rounded",
                                             "Enter Context"
                                         }
                                     }
@@ -249,15 +221,9 @@ pub fn NewProjectCard() -> Element {
                                         class: "flex",
                                         div {
                                             class: "flex flex-col items-center w-5 mr-1",
-                                            div {
-                                                class: "w-px h-3 bg-gray-300",
-                                            }
-                                            div {
-                                                class: "w-full h-px bg-gray-300",
-                                            }
-                                            div {
-                                                class: "w-px h-full grow",
-                                            }
+                                            div { class: "w-px h-3 bg-gray-300" }
+                                            div { class: "w-full h-px bg-gray-300" }
+                                            div { class: "w-px h-full grow" }
                                         }
                                         div {
                                             class: "flex items-center gap-1",
@@ -266,7 +232,7 @@ pub fn NewProjectCard() -> Element {
                                                 "+"
                                             }
                                             div {
-                                                class: "px-2 py-1 text-xs text-gray-700 bg-white border rounded",
+                                                class: "px-2 py-1 text-[11px] text-[#40404080] bg-[#FFFFFF] border-[0.5px] border-[#8F8F8F] rounded",
                                                 "Sub Context"
                                             }
                                         }
@@ -274,142 +240,84 @@ pub fn NewProjectCard() -> Element {
                                 }
                             }
                     
-                            // Feature Extraction (w-7/12)
+                            // Feature Extraction Panel
                             div {
-                                class: "pt-4 w-[56%]",
-                                span { class: "block mb-2 text-xs font-normal", "Feature Extraction" }
-
-                        // Algorithm & Normalize Row
-                        div {
-                            class: "mb-4",
-                            label { class: "mb-1", "Algorithm" }
-                            div {
-                                class:"flex gap-4 items-center",   
-                                // Algorithm Dropdown
+                                class: "pt-3 w-[56%]",
+                                span { class: "block mb-2 text-xs text-[#404040] font-normal", "Feature Extraction" }
+                    
                                 div {
-                                    class: "flex flex-col text-xs",
-                                    select {
-                                        class: "border rounded px-2 py-1 text-xs w-[140px]",
-                                        option { "Subsample" }
-                                        option { "Fullscan" }
+                                    class: "mb-4",
+                                    label { class: "mb-1 font-normal text-[10px] text-[#404040]", "Algorithm" }
+                                    div {
+                                        class: "flex gap-4 items-center",
+                    
+                                        div {
+                                            class: "flex flex-col text-xs",
+                                            select {
+                                                class: "border rounded px-2 py-1 text-xs w-[140px]",
+                                                option { "Subsample" }
+                                                option { "Fullscan" }
+                                            }
+                                        }
+                    
+                                        div {
+                                            class: "flex items-center mb-2 gap-2 mt-2",
+                                            input { r#type: "checkbox", class: "w-4 h-4" }
+                                            label { class: "text-[10px] mb-1 text-[#404040] font-normal", "Normalize" }
+                                        }
                                     }
                                 }
-
-                                // Normalize Checkbox
+                    
+                                div { class: "flex items-center justify-end", label { class: "font-normal text-[10px] text-[#404040]", "Influence field range " } }
+                    
                                 div {
-                                    class: "flex items-center mb-2 gap-2 mt-2",
-                                    input { r#type: "checkbox", class: "w-4 h-4" }
-                                    label { class: "text-xs", "Normalize" }
+                                    class: "grid grid-cols-6 gap-4 text-xs mb-4",
+                                    for label_text in ["Width", "Height", "Block Width", "Block Height", "Max", "Min"] {
+                                        div {
+                                            class: "flex flex-col w-[62px]",
+                                            label { class: "mb-1 font-normal text-[10px] text-[#404040]", "{label_text}" }
+                                            input {
+                                                r#type: "number",
+                                                value: "16",
+                                                class: "border rounded px-2 py-1 text-xs",
+                                            }
+                                        }
+                                    }
+                                }
+                    
+                                div {
+                                    class: "flex justify-end gap-2",
+                                    button {
+                                        class: "bg-[#0387D9] hover:bg-blue-600 text-[#FFFFFF] text-xs font-normal py-1 px-4 rounded-[13px]",
+                                        "Suggest"
+                                    }
+                                    button {
+                                        class: "bg-[#0387D9] hover:bg-blue-600 text-[#FFFFFF] text-xs font-normal py-1 px-4 rounded-[13px]",
+                                        "Validate"
+                                    }
                                 }
                             }
                         }
-                        div { class:"flex items-center justify-end",
-                            label{class:"text-xs", "Influence field range "} }
-                                    // Input Fields Row (Width, Height, Block Width, Block Height, Max, Min)
-                                    div {
-                                        class: "grid grid-cols-6 gap-4 text-xs mb-4",
-
-                                        // Width
-                                        div {
-                                            class: "flex flex-col w-[62px]",
-                                            label { class: "mb-1 text-[10px]", "Width" }
-                                            input {
-                                                r#type: "number",
-                                                value: "16",
-                                                class: "border rounded px-2 py-1 text-xs",
-                                            }
-                                        }
-
-                                        // Height
-                                        div {
-                                            class: "flex flex-col w-[62px]",
-                                            label { class: "mb-1 text-[10px]", "Height" }
-                                            input {
-                                                r#type: "number",
-                                                value: "16",
-                                                class: "border rounded px-2 py-1 text-xs",
-                                            }
-                                        }
-
-                                        // Block Width
-                                        div {
-                                            class: "flex flex-col w-[62px]",
-                                            label { class: "mb-1 text-[10px]", "Block Width" }
-                                            input {
-                                                r#type: "number",
-                                                value: "1",
-                                                class: "border rounded px-2 py-1 text-xs",
-                                            }
-                                        }
-
-                                        // Block Height
-                                        div {
-                                            class: "flex flex-col w-[62px]",
-                                            label { class: "mb-1 text-[10px]", "Block Height" }
-                                            input {
-                                                r#type: "number",
-                                                value: "1",
-                                                class: "border rounded px-2 py-1 text-xs",
-                                            }
-                                        }
-
-                                        // Max
-                                        div {
-                                            class: "flex flex-col w-[62px]",
-                                            label { class: "mb-1 text-[10px]", "Max" }
-                                            input {
-                                                r#type: "number",
-                                                value: "16878",
-                                                class: "border rounded px-2 py-1 text-xs",
-                                            }
-                                        }
-
-                                        // Min
-                                        div {
-                                            class: "flex flex-col w-[62px]",
-                                            label { class: "mb-1 text-[10px]", "Min" }
-                                            input {
-                                                r#type: "number",
-                                                value: "16",
-                                                class: "border rounded px-2 py-1 text-xs",
-                                            }
-                                        }
-                                    }
-
-                                    // Buttons
-                                    div {
-                                        class: "flex justify-end gap-2",
-                                        button {
-                                            class: "bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium py-1 px-4 rounded",
-                                            "Suggest"
-                                        }
-                                        button {
-                                            class: "bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium py-1 px-4 rounded",
-                                            "Validate"
-                                        }
-                                    }
+                    
+                        div {
+                            class: "flex justify-between items-center px-5 py-[13px] bg-[#FAFAFA] border-t",
+                            div {
+                                class: "w-full flex justify-end items-center gap-3",
+                                button {
+                                    class: "text-xs rounded-[3px] px-4 py-1 bg-[#1010101A] text-[#101010]",
+                                    onclick: move |_| show_modal.set(false),
+                                    "Cancel"
                                 }
-                        
-                            }
-                        }
-                        div {
-                    class: "flex justify-between items-center px-6 py-4 bg-gray-50 border-t h-[36px]",
-                        div {
-                            class: "w-full flex justify-end items-center gap-3 bg-white",
-                            button {
-                                class: "text-xs rounded px-4 py-1 w[81px] bg-gray-200 text-gray-600",
-                                onclick: move |_| show_modal.set(false),
-                                "Cancel"
-                            }
-                            button {
-                                class: "text-xs bg-black text-white rounded px-4 py-1 w[81px]",
-                                "Start"
+                                button {
+                                    class: "font-medium text-xs bg-[#101010] text-[#FFFFFF] rounded-[3px] px-4 py-1",
+                                    "Start"
+                                }
                             }
                         }
                     }
+                    
                 }
-                }
-            }
+            }   
         }
     }
 }
