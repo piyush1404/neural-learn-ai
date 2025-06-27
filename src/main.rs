@@ -7,15 +7,12 @@ const TAILWIND_CSS: Asset = asset!("/assets/tailwind.css");
 
 mod components;
 mod date_format;
-mod project_store;
+mod store;
 mod views;
 
-use components::chrome_style_navbar::ChromeStyleNavbar;
-use components::collapsible_image::CollapsibleImage;
-use components::project_details::ProjectDetails;
-use components::top_bar::TopBar;
 use views::home_page::HomePage;
-use views::project_grid::ProjectGrid;
+use views::project_details::ProjectDetails;
+
 
 fn main() {
     LaunchBuilder::new()

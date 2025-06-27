@@ -4,9 +4,10 @@ use std::fs;
 use crate::components::new_project_card::NewProjectCard;
 use crate::components::project_card::ProjectCard;
 
-use crate::project_store::{
-    add_project, delete_project, get_projects_by_name, load_projects, update_project, Project,
+use crate::store::project::{
+    add_project, delete_project, get_projects_by_name, load_projects, update_project, 
 };
+use crate::store::project_schema::Project;
 
 const PAGE_SIZE: usize = 7;
 

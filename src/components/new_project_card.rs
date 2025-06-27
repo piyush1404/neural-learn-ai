@@ -10,12 +10,59 @@ pub fn NewProjectCard() -> Element {
         ("Object".to_string(), "bg-[#F85858]".to_string())
     ]);
 
-    let default_categories = vec![
-        ("Background".to_string(), "bg-[#4C4C4C]".to_string()),
-        ("Object".to_string(), "bg-[#F85858]".to_string()),
+
+    let mut project_name = use_signal(|| "".to_string());
+    let mut platform = use_signal(|| "Simulation".to_string());
+    let mut project_type = use_signal(|| "Image".to_string());
+
+    let mut description = use_signal(|| "".to_string());
+    let mut normalized = use_signal(|| false);
+    let mut algorithm = use_signal(|| "HOG".to_string());
+
+    let mut roi_width = use_signal(|| 64);
+    let mut roi_height = use_signal(|| 64);
+    let mut block_width = use_signal(|| 2);
+    let mut block_height = use_signal(|| 2);
+    let mut range_min = use_signal(|| 5);
+    let mut range_max = use_signal(|| 45000);
+
+    let selected_label = use_signal(|| "Image".to_string());
+    let selected_icon = use_signal(|| "🖼️".to_string());
+    let mut show_options = use_signal(|| false);
+
+    let options = vec![
+        ("Image", "🖼️"),
+        ("Video", "🎥"),
+        ("Audio", "🎧"),
+        ("Text", "📝"),
+        ("3D", "🧊"),
     ];
 
-    let mut description = use_signal(|| "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.".to_string());
+    // Build the options list separately
+    let option_list: Vec<_> = options
+        .iter()
+        .map(|(label, icon)| {
+            let label = label.to_string();
+            let icon = icon.to_string();
+            let mut selected_label = selected_label.clone();
+            let mut selected_icon = selected_icon.clone();
+            let mut show_options = show_options.clone();
+
+            rsx!(
+                li {
+                    class: "flex items-center gap-2 px-4 py-2 text-[#FFFFFF] rounded hover:bg-[#555555]  cursor-pointer",
+                    onclick: move |_| {
+                        selected_label.set(label.clone());
+                        selected_icon.set(icon.clone());
+                        show_options.set(false);
+                    },
+                    span { "{icon}" }
+                    span { "{label}" }
+                }
+            )
+        })
+        .collect();
+
 
     rsx! {
         div {
@@ -71,24 +118,64 @@ pub fn NewProjectCard() -> Element {
                             label { class: "block mb-1 font-normal text-xs text-[#404040]", "Project Name" }
                             input {
                                 class: "w-full border-[0.5px] border-[#8F8F8F] rounded px-4 py-1 font-normal text-xs text-[#313131",
-                                value: {"Sensor clip"},
+                                value: "{project_name}",
+                                oninput: move |e| project_name.set(e.value().to_string())
                             }
                         }
                         div {
                             label { class: "block mb-1 text-xs font-normal text-[#4D4D4D]", "Select Platform" }
                             select {
-                                class: "w-full border-[0.5px] border-[#8F8F8F] rounded px-4 py-1 font-normal text-xs text-[#313131",
+                                class: "w-full border-[0.5px] border-[#8F8F8F] rounded px-4 py-1 font-normal text-xs text-[#313131 appearance-none pr-7",
+                                style: r#"
+                                color: #555555;
+                                background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.99997 5.70028C4.82075 5.70028 4.64155 5.63185 4.50492 5.49528L0.205141 1.19546C-0.0683804 0.921938 -0.0683804 0.478469 0.205141 0.205058C0.478552 -0.0683528 0.921933 -0.0683528 1.19548 0.205058L4.99997 4.00978L8.80449 0.205191C9.07801 -0.0682199 9.52135 -0.0682199 9.79474 0.205191C10.0684 0.478602 10.0684 0.922071 9.79474 1.19559L5.49503 5.49541C5.35832 5.63201 5.17913 5.70028 4.99997 5.70028Z' fill='%23555555'/%3E%3C/svg%3E");
+                                background-repeat: no-repeat;
+                                background-position: right 0.75rem center;
+                                background-size: 10px 6px;
+                            "#,
                                 option { "Simulation" }
-                                option { "Real-Time" }
+                                option { "Brilliant" }
+                                option { "Neuro Shield" }
                             }
                         }
                         div {
                             label { class: "block mb-1 text-xs font-normal text-[#4D4D4D]", "Project Type" }
-                            select {
-                                class: "w-full border-[0.5px] border-[#8F8F8F] rounded px-4 py-1 font-normal text-xs text-[#313131",
-                                option { "Image" }
-                                option { "Video" }
+                            div {
+                                class: "relative w-full text-xs ",
+                    
+                                // Trigger button
+                                div {
+                                    class: "w-full bg-white border border-[#8F8F8F] rounded px-4 py-1 pr-5 flex justify-between items-center text-[#313131] cursor-pointer",
+                                    onclick: move |_| show_options.set(!show_options()),
+                    
+                                    div {
+                                        class: "flex items-center gap-2",
+                                        span { "{selected_icon()}" }
+                                        span { "{selected_label()}" }
+                                    }
+                    
+                                    svg {
+                                        width: "12",
+                                        height: "6",
+                                        view_box: "0 0 12 6",
+                                        fill: "none",
+                                        xmlns: "http://www.w3.org/2000/svg",
+                                        path {
+                                            d: "M6.04749 5.95753C5.86584 5.95753 5.6842 5.88817 5.5457 5.74973L1.18742 1.39141C0.910181 1.11417 0.910181 0.664667 1.18742 0.387536C1.46456 0.110405 1.91397 0.110405 2.19123 0.387536L6.04749 4.24402L9.90378 0.387671C10.181 0.110539 10.6304 0.110539 10.9075 0.387671C11.1849 0.664802 11.1849 1.1143 10.9075 1.39155L6.54929 5.74987C6.41072 5.88832 6.22909 5.95753 6.04749 5.95753Z",
+                                            fill: "#313131"
+                                        }
+                                    }
+                                }
+                    
+                                // Dropdown options
+                                if show_options() {
+                                    ul {
+                                        class: "absolute w-full bg-white border mt-1 rounded shadow z-10",
+                                        {option_list.into_iter()}
+                                    }
+                                }
                             }
+                           
                         }
                     }
                     div {
@@ -102,7 +189,7 @@ pub fn NewProjectCard() -> Element {
                             class: "w-full border border-[#8F8F8F] rounded font-poppins font-normal px-4 py-1 text-xs text-[#313131] resize-none bg-[#FFFFFF] appearance-none outline-none",
                             maxlength: "100",
                             value: "{description}",
-                            oninput: move |e| description.set(e.value().clone())
+                            oninput: move |e| description.set(e.value().to_string())
                         }
                     } 
                    } 
@@ -254,37 +341,142 @@ pub fn NewProjectCard() -> Element {
                                         div {
                                             class: "flex flex-col text-xs",
                                             select {
-                                                class: "border rounded px-2 py-1 text-xs w-[140px]",
+                                                class: "border rounded px-2 py-1 text-xs appearance-none pr-7",
+                                                style: r#"
+                                                color: #555555;
+                                                background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.99997 5.70028C4.82075 5.70028 4.64155 5.63185 4.50492 5.49528L0.205141 1.19546C-0.0683804 0.921938 -0.0683804 0.478469 0.205141 0.205058C0.478552 -0.0683528 0.921933 -0.0683528 1.19548 0.205058L4.99997 4.00978L8.80449 0.205191C9.07801 -0.0682199 9.52135 -0.0682199 9.79474 0.205191C10.0684 0.478602 10.0684 0.922071 9.79474 1.19559L5.49503 5.49541C5.35832 5.63201 5.17913 5.70028 4.99997 5.70028Z' fill='%23555555'/%3E%3C/svg%3E");
+                                                background-repeat: no-repeat;
+                                                background-position: right 0.75rem center;
+                                                background-size: 10px 6px;
+                                            "#,
                                                 option { "Subsample" }
-                                                option { "Fullscan" }
+                                                option {  "Subsample RGB" }
+                                                option { "Histogram" }
+                                                option {  "Histogram Cumulative" }
+                                                option {  "Histogram RGB" }
+                                                option {  "Histogram Cumulative RGB" }
+                                                option {  "Composite Profile" }
+                                                option {  "Horizontal Profile" }
+                                                option {  "Vertical Profile" }
                                             }
                                         }
                     
                                         div {
                                             class: "flex items-center mb-2 gap-2 mt-2",
-                                            input { r#type: "checkbox", class: "w-4 h-4" }
+                                            input { r#type: "checkbox", class: "w-4 h-4 accent-[#0387D9] border border-[#0387D9] rounded", checked: *normalized.read(),
+                                            onchange: move |e| normalized.set(e.value().parse::<bool>().unwrap_or(false)) }
                                             label { class: "text-[10px] mb-1 text-[#404040] font-normal", "Normalize" }
                                         }
                                     }
                                 }
                     
-                                div { class: "flex items-center justify-end", label { class: "font-normal text-[10px] text-[#404040]", "Influence field range " } }
+                                div { class: "flex items-center justify-end pr-10", label { class: "font-normal text-[10px] text-[#404040]", "Influence field range " } }
                     
                                 div {
                                     class: "grid grid-cols-6 gap-4 text-xs mb-4",
-                                    for label_text in ["Width", "Height", "Block Width", "Block Height", "Max", "Min"] {
-                                        div {
-                                            class: "flex flex-col w-[62px]",
-                                            label { class: "mb-1 font-normal text-[10px] text-[#404040]", "{label_text}" }
-                                            input {
-                                                r#type: "number",
-                                                value: "16",
-                                                class: "border rounded px-2 py-1 text-xs",
+                                    div {
+                                        class: "flex flex-col w-[62px]",
+                                        label {
+                                            class: "mb-1 font-normal text-[10px] text-[#404040]",
+                                            "Width"
+                                        }
+                                        input {
+                                            r#type: "number",
+                                            value: "16",
+                                            class: "border rounded px-2 py-1 text-xs",
+                                            oninput: move |e| {
+                                                if let Ok(v) = e.value().parse() {
+                                                    roi_width.set(v);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    div {
+                                        class: "flex flex-col w-[62px]",
+                                        label {
+                                            class: "mb-1 font-normal text-[10px] text-[#404040]",
+                                            "Height"
+                                        }
+                                        input {
+                                            r#type: "number",
+                                            value: "16",
+                                            class: "border rounded px-2 py-1 text-xs",
+                                            oninput: move |e| {
+                                                if let Ok(v) = e.value().parse() {
+                                                    roi_height.set(v);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    div {
+                                        class: "flex flex-col w-[62px]",
+                                        label {
+                                            class: "mb-1 font-normal text-[10px] text-[#404040]",
+                                            "Block Width"
+                                        }
+                                        input {
+                                            r#type: "number",
+                                            value: "1",
+                                            class: "border rounded px-2 py-1 text-xs",
+                                            oninput: move |e| {
+                                                if let Ok(v) = e.value().parse() {
+                                                    block_width.set(v);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    div {
+                                        class: "flex flex-col w-[62px]",
+                                        label {
+                                            class: "mb-1 font-normal text-[10px] text-[#404040]",
+                                            "Block Height"
+                                        }
+                                        input {
+                                            r#type: "number",
+                                            value: "1",
+                                            class: "border rounded px-2 py-1 text-xs",
+                                            oninput: move |e| {
+                                                if let Ok(v) = e.value().parse() {
+                                                    block_height.set(v);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    div {
+                                        class: "flex flex-col w-[62px]",
+                                        label {
+                                            class: "mb-1 font-normal text-[10px] text-[#404040]",
+                                            "Max"
+                                        }
+                                        input {
+                                            r#type: "number",
+                                            value: "16",
+                                            class: "border rounded px-2 py-1 text-xs",
+                                            oninput: move |e| {
+                                                if let Ok(v) = e.value().parse() {
+                                                    range_max.set(v);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    div {
+                                        class: "flex flex-col w-[62px]",
+                                        label {
+                                            class: "mb-1 font-normal text-[10px] text-[#404040]",
+                                            "Min"
+                                        }
+                                        input {
+                                            r#type: "number",
+                                            value: "16",
+                                            class: "border rounded px-2 py-1 text-xs",
+                                            oninput: move |e| {
+                                                if let Ok(v) = e.value().parse() {
+                                                    range_min.set(v);
+                                                }
                                             }
                                         }
                                     }
                                 }
-                    
                                 div {
                                     class: "flex justify-end gap-2",
                                     button {
@@ -309,8 +501,40 @@ pub fn NewProjectCard() -> Element {
                                     "Cancel"
                                 }
                                 button {
+                                    onclick: move |_| {
+                                        let data = serde_json::json!({
+                                            "name": project_name.read().to_string(),
+                                            "platform": platform.read().to_string(),
+                                            // "interface": interface.read().to_string(),
+                                            "type": project_type.read().to_string(),
+                                            "description": description.read().to_string(),
+                                            "categories": categories.read().iter().enumerate().map(|(i, (name, color))| {
+                                                serde_json::json!({
+                                                    "id": i + 1,
+                                                    "name": name,
+                                                    "color": color,
+                                                    "context_id": i + 1 // just as an example
+                                                })
+                                            }).collect::<Vec<_>>(),
+                                            "feature_extraction": {
+                                                "algorithm": algorithm.read().to_string(),
+                                                "normalized": *normalized.read(),
+                                                "roi_width": *roi_width.read(),
+                                                "roi_height": *roi_height.read(),
+                                                "block_width": *block_width.read(),
+                                                "block_height": *block_height.read(),
+                                                "if_field_range": {
+                                                    "min": *range_min.read(),
+                                                    "max": *range_max.read()
+                                                }
+                                            }
+                                        });
+                                
+                                        // Print or send data somewhere
+                                        println!("{:#?}", data);
+                                    },
                                     class: "font-medium text-xs bg-[#101010] text-[#FFFFFF] rounded-[3px] px-4 py-1",
-                                    "Start"
+                                    "Start",
                                 }
                             }
                         }

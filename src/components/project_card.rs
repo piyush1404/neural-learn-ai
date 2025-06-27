@@ -1,4 +1,4 @@
-use crate::project_store::NeuronConfig;
+use crate::store::project_schema::NeuronConfig;
 use dioxus::prelude::*;
 
 use crate::date_format::format_date_mmddyyyy;

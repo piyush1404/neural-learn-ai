@@ -1,7 +1,4 @@
-use regex::RegexBuilder;
 use serde::{Deserialize, Serialize};
-use std::fs::{File, OpenOptions};
-use std::io::{BufReader, BufWriter};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
 pub struct Project {
@@ -145,90 +142,45 @@ pub struct KnowledgeNeuron {
     pub degenerate: bool,
 }
 
-const PROJECT_FILE_PATH: &str = "assets/realistic_projects.json";
 
-/// Load all projects from the file
-pub fn load_projects() -> Vec<Project> {
-    File::open(PROJECT_FILE_PATH)
-        .ok()
-        .map(|f| serde_json::from_reader(BufReader::new(f)).unwrap_or_default())
-        .unwrap_or_default()
+#[derive(Serialize, Deserialize, Debug)]
+pub struct FieldRange {
+    pub min: u32,
+    pub max: u32,
 }
 
-/// Save all projects to the file
-pub fn save_projects(projects: &[Project]) -> std::io::Result<()> {
-    let file = OpenOptions::new()
-        .write(true)
-        .truncate(true)
-        .open(PROJECT_FILE_PATH)?;
-    serde_json::to_writer_pretty(BufWriter::new(file), projects)?;
-    Ok(())
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ProjectFormData {
+    pub name: String,
+    pub platform: String,
+    pub interface: String,
+    pub project_type: String,
+    pub description: String,
+    pub categories: Vec<Category>,
+    pub feature_extraction: FeatureExtraction,
 }
 
-/// Get a project by its name
-pub fn get_projects_by_name(query: &str) -> Vec<Project> {
-    let pattern = query.replace(' ', ".*"); // make space act like wildcard
-    let regex = RegexBuilder::new(&pattern)
-        .case_insensitive(true)
-        .build()
-        .unwrap_or_else(|_| RegexBuilder::new(".*").build().unwrap()); // fallback to match all
 
-    load_projects()
-        .into_iter()
-        .filter(|p| regex.is_match(&p.name))
-        .collect()
-}
 
-/// Add a new project
-pub fn add_project(project: Project) -> std::io::Result<()> {
-    let mut projects = load_projects();
-
-    if projects.iter().any(|p| p.name == project.name) {
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::AlreadyExists,
-            "Project with the same name already exists",
-        ));
-    }
-
-    projects.push(project);
-    save_projects(&projects)
-}
-
-/// Update an existing project by name
-pub fn update_project(name: &str, updated_project: Project) -> std::io::Result<()> {
-    let mut projects = load_projects();
-    if let Some(pos) = projects.iter().position(|p| p.name == name) {
-        projects[pos] = updated_project;
-        save_projects(&projects)
-    } else {
-        Err(std::io::Error::new(
-            std::io::ErrorKind::NotFound,
-            "Project not found",
-        ))
+impl ProjectFormData {
+    pub fn validate(&self) -> Result<(), String> {
+        if self.name.trim().is_empty() {
+            return Err("Project name cannot be empty".into());
+        }
+        if self.platform.trim().is_empty() {
+            return Err("Platform must be selected".into());
+        }
+        if self.project_type.trim().is_empty() {
+            return Err("Type must be selected".into());
+        }
+        if self.description.len() > 100 {
+            return Err("Description must be under 100 characters".into());
+        }
+        if self.feature_extraction.if_field_range.min >= self.feature_extraction.if_field_range.max {
+            return Err("Invalid influence field range (min should be < max)".into());
+        }
+        Ok(())
     }
 }
 
-/// Delete a project by name
-pub fn delete_project(name: &str) -> std::io::Result<()> {
-    let mut projects = load_projects();
-    let original_len = projects.len();
-    projects.retain(|p| p.name != name);
-    if projects.len() != original_len {
-        save_projects(&projects)
-    } else {
-        Err(std::io::Error::new(
-            std::io::ErrorKind::NotFound,
-            "Project not found",
-        ))
-    }
-}
 
-// project_store.rs
-pub mod project_store {
-    pub fn add_project() {}
-    pub fn delete_project() {}
-    pub fn get_project_by_name() {}
-    pub fn load_projects() {}
-    pub fn update_project() {}
-    pub struct Project {}
-}
