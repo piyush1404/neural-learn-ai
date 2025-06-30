@@ -1,209 +1,145 @@
-use dioxus::prelude::*;
+use dioxus::{html::select, prelude::*};
 
 #[component]
-pub fn OptionForAnnotation(onclose: EventHandler<MouseEvent>) -> Element {
-    let mut show_modal = use_signal(|| true);
-    let mut surrounding_example = use_signal(|| "none".to_string());
-    let mut positions = use_signal(|| vec![]);
-
-    let mut distance = use_signal(|| 10);
-
-    let mut toggle_position = {
-        let mut positions = positions.clone();
-        move |pos: &str| {
-            let mut current = positions.read().clone();
-            if current.contains(&pos.to_string()) {
-                current.retain(|p| p != pos);
-            } else {
-                current.push(pos.to_string());
-            }
-            positions.set(current);
-        }
-    };
+pub fn OptionForAnnotation(show_modal_options: Signal<bool>,selected_annotation: Signal<String>) -> Element {
 
     rsx! {
         div {
             class: "fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50",
-            onclick: move |_| show_modal.set(false),
-
             div {
-                class: "w-[480px] h-[375px] bg-[#FAFAFA] rounded shadow p-6",
-                onclick: move |e| e.stop_propagation(),
-
-                // Header
+                class: "w-[480px] bg-[#FFFFFF] rounded-[10px] shadow-lg",
+    
+                // Title Bar
                 div {
-                    class: "flex justify-between text-black items-center mb-4",
+                    class: "h-[42px] flex justify-between items-center px-5 py-3",
                     h2 {
-                        class: "text-[15px] font-medium text-[#404040] font-[Poppins]",
+                        class: "text-sm font-normal text-[#404040]",
                         "Options for Annotations"
                     }
                     button {
-                        class: "text-black text-xl",
-                        onclick: move |e| onclose.call(e),
+                        class: "text-[#555555] hover:text-gray-700 text-xl font-bold",
+                        onclick: move |_| { show_modal_options.set(false); selected_annotation.set("".to_string()); },
                         "×"
                     }
                 }
-
-                // Section Titles
+    
+                // Main content area
                 div {
-                    class: "flex justify-between mb-1",
-                    span { class: "text-[13px] w-[221px] text-black font-medium", "Automatic Surrounding Examples" },
-                    span { class: "text-[13px] w-[202px] text-black font-medium", "Positions" },
-                }
-
-                // Main Body
-                div {
-                    class: "flex justify-between ",
-
-                    // Left Column
+                    class: "bg-[#FAFAFA] flex gap-6",
+    
+                    // Left Section - Automatic Surrounding Examples
                     div {
-                        class: "w-[221px] h-[208px] bg-[#EFEFEF] text-black rounded-md p-4",
-                        label {
-                            class: "flex items-center mb-2 gap-2",
-                            input {
-                                r#type: "radio",
-                                name: "surrounding",
-                                checked: surrounding_example() == "none",
-                                onchange: move |_| surrounding_example.set("none".to_string()),
-                            }
-                            span { "None" }
+                        class: "w-1/2 p-5 border-gray-200",
+                        h3 {
+                            class: "text-xs font-normal text-[#404040] mb-2",
+                            "Automatic Surrounding Examples"
                         }
-                        label {
-                            class: "flex items-center gap-2",
-                            input {
-                                r#type: "radio",
-                                name: "surrounding",
-                                checked: surrounding_example() == "counter",
-                                onchange: move |_| surrounding_example.set("counter".to_string()),
+    
+                        div {
+                            class: "bg-[#EFEFEF] h-[213px] p-5 rounded-md space-y-3 text-sm text-gray-800",
+                            // Radio 1
+                            label {
+                                class: "flex items-center space-x-2",
+                                input {
+                                    r#type: "radio",
+                                    name: "surrounding_examples",
+                                    checked: true,
+                                    class: "w-5 h-5 accent-[#0387D9]"
+                                }
+                                span { class: "font-normal text-[11px] text-[#404040]", "None" }
                             }
-                            span { "Counter Examples" }
+    
+                            // Radio 2
+                            label {
+                                class: "bg-[#EFEFEF] flex items-center space-x-2",
+                                input {
+                                    r#type: "radio",
+                                    name: "surrounding_examples",
+                                   class: "w-5 h-5 accent-[#0387D9]"
+                                }
+                                span { class: "font-normal text-[11px] text-[#404040]", "Counter Examples" }
+                            }
                         }
                     }
-
-                    // Right Column - Hardcoded Checkboxes
+    
+                    // Right Section - Positions
                     div {
-                        class: "px-3 w-[202px] h-[208px] bg-[#EFEFEF] grid grid-cols-3 gap-2 mb-3 text-sm text-[#404040]",
-                        
-                        // Row 1
-                        label {
-                            class: "flex items-center gap-1 text-xs text-[#404040]",
-                            input {
-                                r#type: "checkbox",
-                                checked: positions.read().contains(&"NW".to_string()),
-                                onclick: move |_| toggle_position("NW"),
-                                class: "accent-[#0387D9] w-4 h-4"
-                            }
-                            span { "NW" }
+                        class: "w-1/2 p-5 border-gray-200",
+    
+                        h3 {
+                            class: "text-xs font-normal text-[#404040] mb-2",
+                            "Positions"
                         }
-                        label {
-                            class: "flex items-center gap-1 text-xs text-[#404040]",
-                            input {
-                                r#type: "checkbox",
-                                checked: positions.read().contains(&"N".to_string()),
-                                onclick: move |_| toggle_position("N"),
-                                class: "accent-[#0387D9] w-4 h-4"
-                            }
-                            span { "N" }
-                        }
-                        label {
-                            class: "flex items-center gap-1 text-xs text-[#404040]",
-                            input {
-                                r#type: "checkbox",
-                                checked: positions.read().contains(&"NE".to_string()),
-                                onclick: move |_| toggle_position("NE"),
-                                class: "accent-[#0387D9] w-4 h-4 !accent-[#0387D9]"
-                            }
-                            span { "NE" }
-                        }
-                    
-                        // Row 2
-                        label {
-                            class: "flex items-center gap-1 text-xs text-[#404040]",
-                            input {
-                                r#type: "checkbox",
-                                checked: positions.read().contains(&"W".to_string()),
-                                onclick: move |_| toggle_position("W"),
-                                class: "accent-[#0387D9] w-4 h-4"
-                            }
-                            span { "W" }
-                        }
-                        div {} // This is the center blank space
-                        label {
-                            class: "flex items-center gap-1 text-xs text-[#404040]",
-                            input {
-                                r#type: "checkbox",
-                                checked: positions.read().contains(&"E".to_string()),
-                                onclick: move |_| toggle_position("E"),
-                                class: "accent-[#0387D9] w-4 h-4"
-                            }
-                            span { "E" }
-                        }
-                    
-                        // Row 3
-                        label {
-                            class: "flex items-center gap-1 text-xs text-[#404040]",
-                            input {
-                                r#type: "checkbox",
-                                checked: positions.read().contains(&"SW".to_string()),
-                                onclick: move |_| toggle_position("SW"),
-                                class: "accent-[#0387D9] w-4 h-4"
-                            }
-                            span { "SW" }
-                        }
-                        label {
-                            class: "flex items-center gap-1 text-xs text-[#404040]",
-                            input {
-                                r#type: "checkbox",
-                                checked: positions.read().contains(&"S".to_string()),
-                                onclick: move |_| toggle_position("S"),
-                                class: "accent-[#0387D9] w-4 h-4"
-                            }
-                            span { "S" }
-                        }
-                        label {
-                            class: "flex items-center gap-1 text-xs text-[#404040]",
-                            input {
-                                r#type: "checkbox",
-                                checked: positions.read().contains(&"SE".to_string()),
-                                onclick: move |_| toggle_position("SE"),
-                                class: "accent-[#0387D9] w-4 h-4"
-                            }
-                            span { "SE" }
-                        }
-                        div {
-                            class: "flex items-center gap-2",
-                            // Label
-                            label {
-                                class: "text-sm text-[#404040] font-medium whitespace-nowrap",
-                                "Distance to center"
-                            }
-                
-                            // Number input
-                            input {
-                                r#type: "number",
-                                class: "w-[60px] px-2 py-1 border border-gray-300 rounded text-sm text-center",
-                                value: "{distance}",
-                                oninput: move |e| {
-                                    if let Ok(val) = e.value().parse::<i32>() {
-                                        distance.set(val);
+
+                        div {  class:"bg-[#EFEFEF] h-[213px] rounded-md p-5 space-y-3",
+                            // 3x3 Grid for positions
+                            div {
+                                class: "grid grid-cols-3 gap-2 mb-4",
+                                for (label, checked) in [
+                                    ("NW", false), ("N", false), ("NE", false),
+                                    ("W", false), ("", false), ("E", false),
+                                    ("SW", false), ("S", false), ("SE", false),
+                                ] {
+                                    if label != "" {
+                                        label {
+                                            class: format!(
+                                                "flex items-center justify-start font-normal text-[10px] text-[#404040] {}",
+                                                if checked { "border-blue-500 bg-blue-50" } else { "border-gray-300" }
+                                            ),
+                                            input {
+                                                r#type: "checkbox",
+                                                checked: checked,
+                                                class: "w-5 h-5 accent-[#0387D9] mr-1"
+                                            }
+                                            "{label}"
+                                        }
+                                    } else {
+                                        div {} // Center spacer
                                     }
                                 }
                             }
+                            
+                            
+    
+                        // Distance to center
+                        div {
+                            class: "flex items-center justify-between font-normal text-[10px] text-[#404040]",
+                            span { "Distance to center" }
+                            input {  
+                                r#type: "number",
+                                class: "w-12 h-[26px] border-[0.5px] border-[#8F8F8F] rounded px-2 py-1 font-normal text-xs text-[#313131]",
+                                value: "10",
+                                min: "0",
+                                max: "100",
+                                step: "1"
+                            }
                         }
-                    }
-                    
-                }
 
-                // Footer
+                        }
+    
+                        
+                    }
+                }
+    
+                hr { class: "border border-[#DDDDDD] w-full" }
+
+                // Footer Buttons
                 div {
-                    class: "flex py-3 border-t justify-end gap-3",
+                    class: "bg-[#FAFAFA] flex justify-end px-5 py-3 space-x-2",
                     button {
-                        class: "px-4 py-1 bg-[#E5E5E5] text-black text-sm rounded",
-                        onclick: move |e| onclose.call(e),
+                        onclick: move |_| { 
+                            show_modal_options.set(false);
+                            selected_annotation.set("".to_string());
+                        },
+                        class: "px-4 py-1 bg-[#1010101A] border rounded-[3px] text-[#101010] text-xs font-normal",
                         "Cancel"
                     }
                     button {
-                        class: "px-4 py-1 bg-black text-white text-sm rounded",
+                        onclick: move |_| { 
+                            show_modal_options.set(false);
+                            selected_annotation.set("".to_string());
+                        },
+                        class: "px-4 py-1 bg-[#101010] rounded-[3px] text-[#FFFFFF] text-xs font-normal",
                         "Save"
                     }
                 }

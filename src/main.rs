@@ -34,9 +34,9 @@ fn App() -> Element {
             class: "w-full h-full bg-white font-poppins px-7",
             // ChromeStyleNavbar {}
 
-            HomePage {}
+            // HomePage {}
 
-            // ProjectDetails {}
+            ProjectDetails {}
 
         }
 

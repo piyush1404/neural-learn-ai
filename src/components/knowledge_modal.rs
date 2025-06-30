@@ -1,78 +1,83 @@
 use dioxus::prelude::*;
 
+
+
 #[component]
-pub fn KnowledgeModal(onclose: EventHandler<MouseEvent>) -> Element {
+pub fn KnowledgeModal(show_modal_knowledge_view: Signal<bool>, selected_knowledge: Signal<String>) -> Element {
     let mut selected_tab = use_signal(|| "All".to_string());
     let mut active_subtab = use_signal(|| "Models".to_string());
     let mut dropdown_value = use_signal(|| "All Categories".to_string());
 
-    let tab_items = vec!["All", "Image 1", "Image 2"];
+    let tab_items = vec!["All"];
 
     rsx!(
         div {
             class: "fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50",
 
             div {
-                class: "w-[550px] h-[300px] bg-white rounded p-4",
+                class: "w-[480pxpx] h-[300px] bg-[#FFFFFF] rounded-[10px]",
 
                 // Header
                 div {
-                    class: "flex justify-between items-center border-b pb-2 mb-4",
+                    class: "flex justify-between items-center border-b px-4 py-2",
                     span {
-                        class: "text-gray-500 text-sm font-medium",
+                        class: "text-[#404040] text-sm font-normal",
                         "Knowledge"
                     }
                     button {
-                        class: "text-xl text-gray-600 hover:text-black",
-                        onclick: move |e| onclose.call(e),
+                        class: "text-[#555555] hover:text-gray-700 text-xl font-bold",
+                        onclick: move |_| {
+                            show_modal_knowledge_view.set(false);
+                            selected_knowledge.set("".to_string());
+                        },
                         "×"
                     }
                 }
 
                 // Body
                 div {
-                    class: "flex w-[500px] h-[245px]",
+                    class: "px-4 py-2 flex w-[500px] h-[245px]",
 
                     // Left Sidebar Tabs
                     div {
-                        class: "w-1/4 border-r pr-2 space-y-2 text-sm text-[#404040]",
-                        {
-                            tab_items.iter().map(|item| {
-                                let item = item.to_string();
-                                let selected = *selected_tab.read() == item;
+                        // class: "w-1/4 border-r pr-2 space-y-2 text-sm text-[#404040]",
+                        // {
+                        //     tab_items.iter().map(|item| {
+                        //         let item = item.to_string();
+                        //         let selected = *selected_tab.read() == item;
 
-                                rsx!(
-                                    div {
-                                        class: format_args!(
-                                            "cursor-pointer px-2 py-1 rounded {}",
-                                            if selected {
-                                                "text-[#0387D9] font-medium"
-                                            } else {
-                                                "hover:bg-gray-100"
-                                            }
-                                        ),
-                                        onclick: move |_| selected_tab.set(item.clone()),
-                                        "{item}"
-                                    }
-                                )
-                            })
-                        }
+                        //         rsx!(
+                        //             div {
+                        //                 class: format_args!(
+                        //                     "cursor-pointer px-2 py-1 rounded {}",
+                        //                     if selected {
+                        //                         "text-[#0387D9] font-medium"
+                        //                     } else {
+                        //                         "hover:bg-gray-100"
+                        //                     }
+                        //                 ),
+                        //                 onclick: move |_| selected_tab.set(item.clone()),
+                        //                 "{item}"
+                        //             }
+                        //         )
+                        //     })
+                        // }
                     }
 
                     // Right Panel
                     div {
-                        class: "w-3/4 pl-4",
+                        class: "w-full",
 
                         // Subtabs: Models / Details
                         div {
                             class: "flex space-x-4 mb-3 border-b text-sm",
                             div {
                                 class: format_args!(
-                                    "pb-1 cursor-pointer {}",
+                                    "pb-[2px] cursor-pointer {}",
                                     if *active_subtab.read() == "Models" {
-                                        "text-[#0387D9] border-b-2 border-[#0387D9]"
+                                        "text-[#555555] text-[11px] font-normal border-b-2 border-[#0387D9]"
                                     } else {
-                                        "text-gray-500"
+                                        "text-gray-500 text-[11px] font-normal"
                                     }
                                 ),
                                 onclick: move |_| active_subtab.set("Models".to_string()),
@@ -80,11 +85,11 @@ pub fn KnowledgeModal(onclose: EventHandler<MouseEvent>) -> Element {
                             }
                             div {
                                 class: format_args!(
-                                    "pb-1 cursor-pointer {}",
+                                    "pb-[2px] cursor-pointer {}",
                                     if *active_subtab.read() == "Details" {
-                                        "text-[#0387D9] border-b-2 border-[#0387D9]"
+                                        "text-[#555555] text-[11px] font-normal border-b-2 border-[#0387D9]"
                                     } else {
-                                        "text-gray-500"
+                                       "text-gray-500 text-[11px] font-normal"
                                     }
                                 ),
                                 onclick: move |_| active_subtab.set("Details".to_string()),
@@ -100,7 +105,7 @@ pub fn KnowledgeModal(onclose: EventHandler<MouseEvent>) -> Element {
                                     div {
                                         class: "mb-3 relative",
                                         select {
-                                            class: "appearance-none border border-black rounded px-2 py-1 text-sm text-gray-500 w-full pr-6",
+                                            class: "appearance-none border border-black rounded px-2 py-1 text-[11px] text-[#313131] font-normal w-full pr-6",
                                             value: "{dropdown_value}",
                                             onchange: move |e| dropdown_value.set(e.value()),
 
@@ -128,73 +133,68 @@ pub fn KnowledgeModal(onclose: EventHandler<MouseEvent>) -> Element {
 
                                     // Masked Fields
                                     div {
-                                        class: "space-y-2",
+                                        class: "space-y-2 overflow-x-auto",
                                         input {
                                             r#type: "text",
                                             disabled: true,
-                                            value: "■■■■■■■■■■■■■■■■■■",
+                                            value: "■■■■■■■■■■■■■■🔢🔢🔢🔢🔢🔢🔢🔢■■■■■■■■■■■👀👀👀👀👀👀👀👀■■■■■■■■■■■■🤖🤖🤖🤖🤖🤖🤖🤖■■■■■🧱🧱🧱🧱🧱🧱🧱🧱🔵🔵🔵🔵🔵🔵🔵🔵🔵■■■■■■■■■■⭐️⭐️⭐️⭐️⭐️⭐️⭐️⭐️■■■■■■■■🔒🔒🔒🔒🔒🔒🔒🔒■■■",
                                             class: "w-full border border-gray-300 rounded px-2 py-1 bg-gray-200 text-gray-600 tracking-widest"
                                         }
-                                        input {
-                                            r#type: "text",
-                                            disabled: true,
-                                            value: "■■■■■■■■■■■■■■■■■■",
-                                            class: "w-full border border-gray-300 rounded px-2 py-1 bg-gray-200 text-gray-600 tracking-widest"
-                                        }
+                                       
                                     }
                                 )
                             } 
                             else {
                                 rsx!(
                                     div {
-                                        class: "grid grid-cols-6 text-sm",
+                                        class: "grid grid-cols-6 gap-2 font-normal text-[10px] text-[#555555]",
                                 
                                         // Neuron ID Column
-                                        div { class: "bg-[#555555] text-black px-2 py-1 border text-center", "Neuron ID" }
-                                        div { class: "bg-[#EDEDED] text-[#555555] px-2 py-1 border text-center", "1" }
-                                        div { class: "bg-[#EDEDED] text-[#555555] px-2 py-1 border text-center", "2" }
-                                        div { class: "bg-[#EDEDED] text-[#555555] px-2 py-1 border text-center", "3" }
-                                        div { class: "bg-[#EDEDED] text-[#555555] px-2 py-1 border text-center", "4" }
-                                        div { class: "bg-[#EDEDED] text-[#555555] px-2 py-1 border text-center", "5" }
+                                        div { class: "h-5 flex items-center justify-center pl-[9px] pt-[3px] pr-[6px] pb-[2px] bg-[#D9D9D9] rounded-[3px]", "Neuron ID" }
+                                        div { class: "flex items-center justify-center pl-[9px] pt-[3px] pr-[6px] pb-[2px] bg-[#EDEDED] rounded-[3px] ", "1" }
+                                        div { class: "flex items-center justify-center pl-[9px] pt-[3px] pr-[6px] pb-[2px] bg-[#EDEDED] rounded-[3px] ", "2" }
+                                        div { class: "flex items-center justify-center pl-[9px] pt-[3px] pr-[6px] pb-[2px] bg-[#EDEDED] rounded-[3px] ", "3" }
+                                        div { class: "flex items-center justify-center pl-[9px] pt-[3px] pr-[6px] pb-[2px] bg-[#EDEDED] rounded-[3px] ", "4" }
+                                        div { class: "flex items-center justify-center pl-[9px] pt-[3px] pr-[6px] pb-[2px] bg-[#EDEDED] rounded-[3px]", "5" }
                                 
                                         // Category Column
-                                        div { class: "bg-[#555555] text-black px-2 py-1 border text-center", "Category" }
+                                        div {  class: "h-5 flex items-center justify-center pl-[9px] pt-[3px] pr-[6px] pb-[2px] bg-[#D9D9D9] rounded-[3px]", "Category" }
                                         { (0..5).map(|_| rsx!(
-                                            div { class: "bg-[#EDEDED] text-[#555555] px-2 py-1 border text-center", "1" }
+                                            div { class: "flex items-center justify-center pl-[9px] pt-[3px] pr-[6px] pb-[2px] bg-[#EDEDED] rounded-[3px]", "1" }
                                         )) }
                                 
                                         // NCR Column
-                                        div { class: "bg-[#555555] text-black px-2 py-1 border text-center", "NCR" }
+                                        div {  class: "h-5 flex items-center justify-center pl-[9px] pt-[3px] pr-[6px] pb-[2px] bg-[#D9D9D9] rounded-[3px]", "NCR" }
                                         { (0..5).map(|_| rsx!(
-                                            div { class: "bg-[#EDEDED] text-[#555555] px-2 py-1 border text-center", "Object" }
+                                            div { class: "flex items-center justify-center pl-[9px] pt-[3px] pr-[6px] pb-[2px] bg-[#EDEDED] rounded-[3px]", "Object" }
                                         )) }
                                 
                                         // Model Column
-                                        div { class: "bg-[#555555] text-black px-2 py-1 border text-center", "Model" }
+                                        div {  class: "h-5 flex items-center justify-center pl-[9px] pt-[3px] pr-[6px] pb-[2px] bg-[#D9D9D9] rounded-[3px]", "Model" }
                                         { (0..5).map(|_| rsx!(
-                                            div { class: "bg-[#EDEDED] text-[#555555] px-2 py-1 border text-center", "Model" }
+                                            div { class: "flex items-center justify-center pl-[9px] pt-[3px] pr-[6px] pb-[2px] bg-[#EDEDED] rounded-[3px]", "Model" }
                                         )) }
                                 
                                         // Active IF Column
-                                        div { class: "bg-[#555555] text-black px-2 py-1 border text-center", "Active IF" }
+                                        div {  class: "h-5 flex items-center justify-center pl-[9px] pt-[3px] pr-[6px] pb-[2px] bg-[#D9D9D9] rounded-[3px]", "Active IF" }
                                         { ["2378", "2379", "2380", "2381", "2382"].iter().map(|v| rsx!(
-                                            div { class: "bg-[#EDEDED] text-[#555555] px-2 py-1 border text-center", "{v}" }
+                                            div { class: "flex items-center justify-center pl-[9px] pt-[3px] pr-[6px] pb-[2px] bg-[#EDEDED] rounded-[3px]", "{v}" }
                                         )) }
                                 
                                         // Min IF Column
-                                        div { class: "bg-[#555555] text-black px-2 py-1 border text-center", "Min IF" }
+                                        div {  class: "h-5 flex items-center justify-center pl-[9px] pt-[3px] pr-[6px] pb-[2px] bg-[#D9D9D9] rounded-[3px]", "Min IF" }
                                         { (0..5).map(|_| rsx!(
-                                            div { class: "bg-[#EDEDED] text-[#555555] px-2 py-1 border text-center", "2" }
+                                            div { class: "flex items-center justify-center pl-[9px] pt-[3px] pr-[6px] pb-[2px] bg-[#EDEDED] rounded-[3px]", "2" }
                                         )) }
                                 
                                         // Degenerated Column with checkbox
-                                        div { class: "bg-[#555555] text-black px-2 py-1 border text-center", "Degenerated" }
+                                        div {  class: "h-5 flex items-center justify-center pl-[9px] pt-[3px] pr-[6px] pb-[2px] bg-[#D9D9D9] rounded-[3px]", "Degenerated" }
                                         { (0..5).map(|_| rsx!(
                                             div {
-                                                class: "bg-[#EDEDED] px-2 py-1 border flex justify-center items-center",
+                                                class: "flex items-center justify-center pl-[9px] pt-[3px] pr-[6px] pb-[2px] bg-[#EDEDED] rounded-[3px]",
                                                 input {
                                                     r#type: "checkbox",
-                                                    class: "form-checkbox w-4 h-4 accent-[#0387D9]"
+                                                    class: "form-checkbox w-[14px] h-[14px] border border-[#555555] accent-[#0387D9]"
                                                 }
                                             }
                                         )) }

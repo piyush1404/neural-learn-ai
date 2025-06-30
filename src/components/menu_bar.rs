@@ -1,7 +1,15 @@
-use dioxus::prelude::*;
+use dioxus::{html::tr, prelude::*};
+
+use crate::components::{knowledge_modal::KnowledgeModal, option_annotations::OptionForAnnotation};
 
 #[component]
 pub fn MenuBar() -> Element {
+
+    let mut selected_annotation = use_signal(|| "".to_string());
+    let mut show_modal_options = use_signal(|| false);
+    let mut selected_knowledge = use_signal(|| "".to_string());
+    let mut show_modal_knowledge_view = use_signal(|| false);
+
     rsx! {
         div {
             class:"h-[40px] flex items-center gap-2 mx-6",
@@ -52,6 +60,8 @@ pub fn MenuBar() -> Element {
                 class:"w-full flex items-center justify-end gap-4",
                 select {
                     class: "px-3 py-1 font-normal text-[11px] text-[#555555] appearance-none pr-7",
+                    value: "{selected_annotation}",
+
                     style: r#"
                     color: #555555;
                     background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.99997 5.70028C4.82075 5.70028 4.64155 5.63185 4.50492 5.49528L0.205141 1.19546C-0.0683804 0.921938 -0.0683804 0.478469 0.205141 0.205058C0.478552 -0.0683528 0.921933 -0.0683528 1.19548 0.205058L4.99997 4.00978L8.80449 0.205191C9.07801 -0.0682199 9.52135 -0.0682199 9.79474 0.205191C10.0684 0.478602 10.0684 0.922071 9.79474 1.19559L5.49503 5.49541C5.35832 5.63201 5.17913 5.70028 4.99997 5.70028Z' fill='%23555555'/%3E%3C/svg%3E");
@@ -59,10 +69,57 @@ pub fn MenuBar() -> Element {
                     background-position: right 0.75rem center;
                     background-size: 10px 6px;
                 "#,
-                    option { value: "", disabled: true, selected: true, "Annotations" }
-                    option { value: "web", "Web" }
-                    option { value: "mobile", "Mobile" }
-                    option { value: "desktop", "Desktop" }
+                onchange: move |e| {
+                    let value = e.value();
+                    selected_annotation.set(value.clone());
+                    if value == "options" {
+                        show_modal_options.set(true);
+                    }
+                },
+
+                option { value: "", disabled: true, hidden: true, selected: selected_annotation() == "", "Annotations" }
+                option { value: "options", "Options" }
+                option { value: "clear_image", "Clear in current image" }
+                option { value: "clear_all", "Clear all" }
+                option { value: "load", "Load" }
+                option { value: "review_all", "Review all" }
+                option { value: "save_all", "Save all" }
+
+                }
+
+                if *show_modal_options.read() {
+        
+                    OptionForAnnotation { show_modal_options: show_modal_options, selected_annotation: selected_annotation }
+                }
+                
+                select {
+                    class: "px-3 py-1 font-normal text-[11px] text-[#555555] appearance-none pr-7",
+                    style: r#"
+                    color: #555555;
+                    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.99997 5.70028C4.82075 5.70028 4.64155 5.63185 4.50492 5.49528L0.205141 1.19546C-0.0683804 0.921938 -0.0683804 0.478469 0.205141 0.205058C0.478552 -0.0683528 0.921933 -0.0683528 1.19548 0.205058L4.99997 4.00978L8.80449 0.205191C9.07801 -0.0682199 9.52135 -0.0682199 9.79474 0.205191C10.0684 0.478602 10.0684 0.922071 9.79474 1.19559L5.49503 5.49541C5.35832 5.63201 5.17913 5.70028 4.99997 5.70028Z' fill='%23555555'/%3E%3C/svg%3E");
+                    background-repeat: no-repeat;
+                    background-position: right 0.75rem center;
+                    background-size: 10px 6px;
+                "#,
+                onchange: move |e| {
+                    let value = e.value();
+                    selected_knowledge.set(value.clone());
+                    if value == "view" {
+                        show_modal_knowledge_view.set(true);
+                    } else if value == "clear" {
+                        // logic to clear
+                    } else if value == "undo_last_learning" {
+                        // logic to undo
+                    }
+                },
+                option { value: "", disabled: true,hidden: true, selected: selected_knowledge() == "", "Knowledge" }
+                option { value: "view", "View" }
+                option { value: "clear", "Clear" }
+                option { value: "undo_last_learning", "Undo last learning" }
+                }
+
+                if show_modal_knowledge_view(){
+                    KnowledgeModal { show_modal_knowledge_view: show_modal_knowledge_view, selected_knowledge: selected_knowledge }
                 }
 
                 select {
@@ -74,10 +131,12 @@ pub fn MenuBar() -> Element {
                     background-position: right 0.75rem center;
                     background-size: 10px 6px;
                 "#,
-                    option { value: "", disabled: true, selected: true, "Knowledge" }
-                    option { value: "web", "Web" }
-                    option { value: "mobile", "Mobile" }
-                    option { value: "desktop", "Desktop" }
+                    option { value: "", disabled: true,hidden: true, selected: true, "Results" }
+                    option { value: "clear_in_current_image", "Clear in current image" }
+                    option { value: "clear_all", "Clear all" }
+                    option { value: "review_all", "Review all" }
+                    option { value: "save_all", "Save all" }
+                    option { value: "details_at_cursor", "Details at cursor" }
                 }
 
                 select {
@@ -89,28 +148,14 @@ pub fn MenuBar() -> Element {
                     background-position: right 0.75rem center;
                     background-size: 10px 6px;
                 "#,
-                    option { value: "", disabled: true, selected: true, "Results" }
-                    option { value: "web", "Web" }
-                    option { value: "mobile", "Mobile" }
-                    option { value: "desktop", "Desktop" }
+                    option { value: "", disabled: true, hidden: true, selected: true, "Options" }
+                    option { value: "cursor_color", "Cursor Color" }
+                    option { value: "cursor_info", "Cursor info" }
+                    option { value: "timing_info", "Timing info" }
+                    option { value: "save_transform_image", "Save transform image" }
                 }
 
-                select {
-                    class: "px-3 py-1 font-normal text-[11px] text-[#555555] appearance-none pr-7",
-                    style: r#"
-                    color: #555555;
-                    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.99997 5.70028C4.82075 5.70028 4.64155 5.63185 4.50492 5.49528L0.205141 1.19546C-0.0683804 0.921938 -0.0683804 0.478469 0.205141 0.205058C0.478552 -0.0683528 0.921933 -0.0683528 1.19548 0.205058L4.99997 4.00978L8.80449 0.205191C9.07801 -0.0682199 9.52135 -0.0682199 9.79474 0.205191C10.0684 0.478602 10.0684 0.922071 9.79474 1.19559L5.49503 5.49541C5.35832 5.63201 5.17913 5.70028 4.99997 5.70028Z' fill='%23555555'/%3E%3C/svg%3E");
-                    background-repeat: no-repeat;
-                    background-position: right 0.75rem center;
-                    background-size: 10px 6px;
-                "#,
-                    option { value: "", disabled: true, selected: true, "Options" }
-                    option { value: "web", "Web" }
-                    option { value: "mobile", "Mobile" }
-                    option { value: "desktop", "Desktop" }
-                }
             }
-
             div {
                 class:"flex items-center space-x-[10px]",
                 div {
