@@ -1,9 +1,8 @@
 use regex::RegexBuilder;
-use serde::{Deserialize, Serialize};
 use std::fs::{File, OpenOptions};
 use std::io::{BufReader, BufWriter};
 
-use crate::store::project_schema::Project;
+use crate::store::project_schema::{Project};
 
 const PROJECT_FILE_PATH: &str = "assets/realistic_projects.json";
 
@@ -50,7 +49,8 @@ pub fn add_project(project: Project) -> std::io::Result<()> {
         ));
     }
 
-    projects.push(project);
+    // projects.push(project);
+    projects.insert(0, project);
     save_projects(&projects)
 }
 

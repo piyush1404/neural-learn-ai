@@ -152,7 +152,7 @@ pub fn ProjectCard(
             } else {
                 // ORIGINAL VIEW (what you already had)
                 div {
-                        class: "relative group border border-[#BEBEBE] hover:border-[#A0A0A0] rounded-xl p-[15px] shadow-sm hover:shadow-md hover:scale-[1.01] cursor-pointer transition-all duration-200 flex flex-col gap-1",
+                        class: "h-full relative group border border-[#BEBEBE] hover:border-[#A0A0A0] rounded-xl p-[15px] shadow-sm hover:shadow-md hover:scale-[1.01] cursor-pointer transition-all duration-200 flex flex-col gap-1",
                         // Header with icon and name
                         div {
                             class: "flex items-center gap-3",

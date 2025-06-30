@@ -250,11 +250,11 @@ pub fn HomePage() -> Element {
                     rsx! {
                         ProjectCard {
                             name: project.name.clone(),
-                            platform: project.platform.clone(),
-                            interface: project.interface.clone(),
-                            description: project.description.clone(),
-                            created_at: project.created_at.clone(),
-                            updated_at: project.updated_at.clone(),
+                            platform: project.platform.clone().unwrap_or("Unknown".to_string()),
+                            interface: project.interface.clone().unwrap_or("Unknown".to_string()),
+                            description: project.description.unwrap_or("Unknown".to_string()),
+                            created_at: project.created_at.unwrap_or("Unknown".to_string()),
+                            updated_at: project.updated_at.unwrap_or("Unknown".to_string()),
                             neurons: project.neurons.clone().map(|n| n)
                         }
                     }

@@ -3,12 +3,12 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
 pub struct Project {
     pub name: String,
-    pub platform: String,
-    pub interface: String,
-    pub r#type: String,
-    pub description: String,
-    pub created_at: String,
-    pub updated_at: String,
+    pub platform: Option<String>,
+    pub interface: Option<String>,
+    pub r#type: Option<String>,
+    pub description: Option<String>,
+    pub created_at: Option<String>,
+    pub updated_at: Option<String>,
     pub files: Option<Vec<FileInfo>>,
     pub neurons: Option<NeuronConfig>,
     pub categories: Option<Vec<Category>>,
@@ -149,38 +149,37 @@ pub struct FieldRange {
     pub max: u32,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct ProjectFormData {
-    pub name: String,
-    pub platform: String,
-    pub interface: String,
-    pub project_type: String,
-    pub description: String,
-    pub categories: Vec<Category>,
-    pub feature_extraction: FeatureExtraction,
-}
+// #[derive(Serialize, Deserialize, Debug)]
+// pub struct ProjectFormData {
+//     pub name: String,
+//     pub platform: String,
+//     pub project_type: String,
+//     pub description: String,
+//     pub categories: Vec<Category>,
+//     pub feature_extraction: FeatureExtraction,
+// }
 
 
 
-impl ProjectFormData {
-    pub fn validate(&self) -> Result<(), String> {
-        if self.name.trim().is_empty() {
-            return Err("Project name cannot be empty".into());
-        }
-        if self.platform.trim().is_empty() {
-            return Err("Platform must be selected".into());
-        }
-        if self.project_type.trim().is_empty() {
-            return Err("Type must be selected".into());
-        }
-        if self.description.len() > 100 {
-            return Err("Description must be under 100 characters".into());
-        }
-        if self.feature_extraction.if_field_range.min >= self.feature_extraction.if_field_range.max {
-            return Err("Invalid influence field range (min should be < max)".into());
-        }
-        Ok(())
-    }
-}
+// impl ProjectFormData {
+//     pub fn validate(&self) -> Result<(), String> {
+//         if self.name.trim().is_empty() {
+//             return Err("Project name cannot be empty".into());
+//         }
+//         if self.platform.trim().is_empty() {
+//             return Err("Platform must be selected".into());
+//         }
+//         if self.project_type.trim().is_empty() {
+//             return Err("Type must be selected".into());
+//         }
+//         if self.description.len() > 100 {
+//             return Err("Description must be under 100 characters".into());
+//         }
+//         if self.feature_extraction.if_field_range.min >= self.feature_extraction.if_field_range.max {
+//             return Err("Invalid influence field range (min should be < max)".into());
+//         }
+//         Ok(())
+//     }
+// }
 
 
