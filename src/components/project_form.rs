@@ -364,7 +364,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                         div {
                             class: "pt-3 border-r w-[22%] flex flex-col justify-between h-[266px]",
                             div {
-                                class: "relative mb-2 space-y-2 h-[266px]",
+                                class: "relative mb-2 overflow-y-auto space-y-2 h-[266px]",
                 
                                 span { class: "block mb-2 text-xs text-[#404040] font-normal", "Categories" }
                 
@@ -377,7 +377,8 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                 for (index, (name, color)) in categories.read().iter().cloned().enumerate() {
                                     div {
                                         class: "flex items-center gap-2",
-                
+                                
+                                        // Text input for category name
                                         input {
                                             class: "border p-1 w-[91px] rounded text-sm h-[20px]",
                                             value: "{name}",
@@ -387,13 +388,21 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                                 categories.set(updated);
                                             }
                                         }
-                
-                                        div {
-                                            div {
-                                                class: format_args!("w-[28px] h-[20px] rounded border border-gray-300 {}", color),
+                                
+                                        // Color input styled like a box
+                                        input {
+                                            r#type: "color",
+                                            class: "appearance-none border border-gray-300 w-[28px] h-[20px] p-0 rounded cursor-pointer",
+                                            value: extract_hex(&color), // assumes you're storing either hex or class name
+                                            onchange: move |e| {
+                                                let hex = e.value();
+                                                let mut updated = categories.write().clone();
+                                                updated[index].1 = hex.clone(); // store raw hex color
+                                                categories.set(updated);
                                             }
                                         }
-                
+                                
+                                        // Add/Remove Buttons
                                         div {
                                             if categories.read().len() > 1 && index != categories.read().len() - 1 {
                                                 button {
@@ -411,7 +420,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                                     class: "w-[19px] h-[19px] rounded-sm border border-blue-300 text-blue-500 text-sm flex items-center justify-center",
                                                     onclick: move |_| {
                                                         let mut updated = categories.write().clone();
-                                                        updated.push(("".to_string(), "bg-black".to_string()));
+                                                        updated.push(("".to_string(), "#000000".to_string()));
                                                         categories.set(updated);
                                                     },
                                                     "+"
@@ -420,6 +429,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                         }
                                     }
                                 }
+                                
                 
                                 div {
                                     class: "absolute bottom-[20px] right-[10px]",
@@ -709,5 +719,15 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                 }       
             }
         }   
+    }
+}
+
+fn extract_hex(color: &str) -> String {
+    match color {
+        "bg-red-500" => "#ef4444".to_string(),
+        "bg-black" => "#000000".to_string(),
+        "bg-zinc-800" => "#27272a".to_string(),
+        hex if hex.starts_with('#') => hex.to_string(),
+        _ => "#000000".to_string(), // fallback
     }
 }
