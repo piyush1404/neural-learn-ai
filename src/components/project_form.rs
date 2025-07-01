@@ -1,12 +1,14 @@
 use dioxus::prelude::*;
-use crate::store::project_schema::{ Project};
+use uuid::Uuid;
+use crate::store::project_schema::{ Project, Category};
 use crate::store::project::{ add_project };
 use crate::date_format::{get_local_and_utc_iso};
-
 #[derive(PartialEq, Props, Clone)]
 pub struct ProjectFormProps {
-    show_modal: Signal<bool>
+    show_modal: Signal<bool>,
+    project: Option<Project>,
 }
+
 #[component]
 pub fn ProjectForm(props: ProjectFormProps) -> Element {
     let (_, utc_iso) = get_local_and_utc_iso();
@@ -14,30 +16,29 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
     let mut show_modal = props.show_modal;
     let mut show_advanced = use_signal(|| false);
 
-    let mut categories = use_signal(|| vec![
-        ("Background".to_string(), "bg-[#4C4C4C]".to_string()),
-        ("Object".to_string(), "bg-[#F85858]".to_string())
-    ]);
+    let mut categories = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().categories.clone() } else { vec![
+        Category { id: 0, name: "Background".to_string(), color: "#4C4C4C".to_string(), context_id: 0 },
+    ] });
 
 
-    let mut project_name = use_signal(|| "".to_string());
+    let mut project_name = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().name.clone() } else { "".to_string() });
     let mut project_name_error=use_signal(|| false);
-    let mut platform = use_signal(|| "Simulation".to_string());
-    let project_type = use_signal(|| "Image".to_string());
+    let mut platform = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().platform.clone() } else { "Simulation".to_string() });
+    let project_type = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().interface.clone() } else { "image".to_string() });
 
-    let mut description = use_signal(|| "".to_string());
+    let mut description = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().description.clone() } else { "".to_string() });
     let mut description_error=use_signal(|| false);
-    let mut normalized = use_signal(|| false);
-    let algorithm = use_signal(|| "HOG".to_string());
+    let mut normalized = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().normalized } else { false });
+    let mut algorithm = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().algorithm.clone() } else { "Subsample".to_string() });
 
-    let mut roi_width = use_signal(|| 64);
-    let mut roi_height = use_signal(|| 64);
-    let mut block_width = use_signal(|| 2);
-    let mut block_height = use_signal(|| 2);
-    let mut range_min = use_signal(|| 5);
-    let mut range_max = use_signal(|| 45000);
+    let mut roi_width = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().roi_width } else { 64 });
+    let mut roi_height = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().roi_height } else { 64 });
+    let mut block_width = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().block_width } else { 16 });
+    let mut block_height = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().block_height } else { 16 });
+    let mut range_min = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().if_field_range.min } else { 0 });
+    let mut range_max = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().if_field_range.max } else { 255 });
 
-    let selected_label = use_signal(|| "Image".to_string());
+    let selected_label = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().interface.clone() } else { "Image".to_string() });
     let mut selected_icon = use_signal(|| rsx!(svg {
         width: "15",
         height: "15",
@@ -263,6 +264,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                         }
                         select {
                             class: "w-full border-[0.5px] border-[#8F8F8F] rounded px-4 py-1 font-normal text-xs text-[#313131] appearance-none pr-7",
+                            value: "{platform}",
                             style: r#"
                                 color: #555555;
                                 background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.99997 5.70028C4.82075 5.70028 4.64155 5.63185 4.50492 5.49528L0.205141 1.19546C-0.0683804 0.921938 -0.0683804 0.478469 0.205141 0.205058C0.478552 -0.0683528 0.921933 -0.0683528 1.19548 0.205058L4.99997 4.00978L8.80449 0.205191C9.07801 -0.0682199 9.52135 -0.0682199 9.79474 0.205191C10.0684 0.478602 10.0684 0.922071 9.79474 1.19559L5.49503 5.49541C5.35832 5.63201 5.17913 5.70028 4.99997 5.70028Z' fill='%23555555'/%3E%3C/svg%3E");
@@ -363,46 +365,43 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                         // Categories Panel
                         div {
                             class: "pt-3 border-r w-[22%] flex flex-col justify-between h-[266px]",
+                        
                             div {
                                 class: "relative mb-2 overflow-y-auto space-y-2 h-[266px]",
-                
+                        
                                 span { class: "block mb-2 text-xs text-[#404040] font-normal", "Categories" }
-                
+                        
                                 div {
                                     class: "flex items-center gap-2 text-xs text-[#404040] mb-1",
                                     span { class: "w-[91px] text-[10px] h-[15px] rounded", "Name" }
                                     span { class: "w-[28px] text-[10px] h-[15px]", "Color" }
                                 }
-                
-                                for (index, (name, color)) in categories.read().iter().cloned().enumerate() {
+                        
+                                for (index, category) in categories.read().iter().cloned().enumerate() {
                                     div {
                                         class: "flex items-center gap-2",
-                                
-                                        // Text input for category name
+                        
                                         input {
-                                            class: "border p-1 w-[91px] rounded text-sm h-[20px]",
-                                            value: "{name}",
+                                            class: "border p-1 w-[91px] rounded text-[11px] font-normal text-[#404040] h-5",
+                                            value: "{category.name}",
                                             oninput: move |e| {
                                                 let mut updated = categories.write().clone();
-                                                updated[index].0 = e.value().clone();
+                                                updated[index].name = e.value().clone();
                                                 categories.set(updated);
                                             }
                                         }
-                                
-                                        // Color input styled like a box
+                        
                                         input {
                                             r#type: "color",
                                             class: "appearance-none border border-gray-300 w-[28px] h-[20px] p-0 rounded cursor-pointer",
-                                            value: extract_hex(&color), // assumes you're storing either hex or class name
+                                            value: category.color.clone(),
                                             onchange: move |e| {
-                                                let hex = e.value();
                                                 let mut updated = categories.write().clone();
-                                                updated[index].1 = hex.clone(); // store raw hex color
+                                                updated[index].color = e.value().clone();
                                                 categories.set(updated);
                                             }
                                         }
-                                
-                                        // Add/Remove Buttons
+                        
                                         div {
                                             if categories.read().len() > 1 && index != categories.read().len() - 1 {
                                                 button {
@@ -420,7 +419,13 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                                     class: "w-[19px] h-[19px] rounded-sm border border-blue-300 text-blue-500 text-sm flex items-center justify-center",
                                                     onclick: move |_| {
                                                         let mut updated = categories.write().clone();
-                                                        updated.push(("".to_string(), "#000000".to_string()));
+                                                        let new_id = updated.last().map_or(1, |c| c.id + 1);
+                                                        updated.push(Category {
+                                                            id: new_id,
+                                                            name: "".to_string(),
+                                                            color: "#000000".to_string(),
+                                                            context_id: 101, // Adjust as per your app context
+                                                        });
                                                         categories.set(updated);
                                                     },
                                                     "+"
@@ -429,16 +434,25 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                         }
                                     }
                                 }
-                                
-                
+                        
                                 div {
                                     class: "absolute bottom-[20px] right-[10px]",
                                     button {
                                         class: "bg-[#0387D9] text-[#FFFFFF] px-4 py-1 rounded-[13px] text-sm",
                                         onclick: move |_| {
                                             categories.set(vec![
-                                                ("Background".to_string(), "bg-zinc-800".to_string()),
-                                                ("Object".to_string(), "bg-red-500".to_string()),
+                                                Category {
+                                                    id: 1,
+                                                    name: "Background".to_string(),
+                                                    color: "#4C4C4C".to_string(),
+                                                    context_id: 101,
+                                                },
+                                                Category {
+                                                    id: 2,
+                                                    name: "Object".to_string(),
+                                                    color: "#F85858".to_string(),
+                                                    context_id: 101,
+                                                },
                                             ]);
                                         },
                                         "Reset"
@@ -503,6 +517,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                         class: "flex flex-col text-xs",
                                         select {
                                             class: "border rounded px-2 py-1 text-xs appearance-none pr-7",
+                                            value: "{algorithm}",
                                             style: r#"
                                             color: #555555;
                                             background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.99997 5.70028C4.82075 5.70028 4.64155 5.63185 4.50492 5.49528L0.205141 1.19546C-0.0683804 0.921938 -0.0683804 0.478469 0.205141 0.205058C0.478552 -0.0683528 0.921933 -0.0683528 1.19548 0.205058L4.99997 4.00978L8.80449 0.205191C9.07801 -0.0682199 9.52135 -0.0682199 9.79474 0.205191C10.0684 0.478602 10.0684 0.922071 9.79474 1.19559L5.49503 5.49541C5.35832 5.63201 5.17913 5.70028 4.99997 5.70028Z' fill='%23555555'/%3E%3C/svg%3E");
@@ -510,15 +525,16 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                             background-position: right 0.75rem center;
                                             background-size: 10px 6px;
                                         "#,
-                                            option { "Subsample" }
-                                            option {  "Subsample RGB" }
-                                            option { "Histogram" }
-                                            option {  "Histogram Cumulative" }
-                                            option {  "Histogram RGB" }
-                                            option {  "Histogram Cumulative RGB" }
-                                            option {  "Composite Profile" }
-                                            option {  "Horizontal Profile" }
-                                            option {  "Vertical Profile" }
+                                        onchange: move |e| algorithm.set(e.value()),
+                                        option { "Subsample" }
+                                        option {  "Subsample RGB" }
+                                        option { "Histogram" }
+                                        option {  "Histogram Cumulative" }
+                                        option {  "Histogram RGB" }
+                                        option {  "Histogram Cumulative RGB" }
+                                        option {  "Composite Profile" }
+                                        option {  "Horizontal Profile" }
+                                        option {  "Vertical Profile" }
                                         }
                                     }
                 
@@ -543,7 +559,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                     }
                                     input {
                                         r#type: "number",
-                                        value: "16",
+                                        value: "{roi_width}",
                                         class: "border rounded px-2 py-1 text-xs",
                                         oninput: move |e| {
                                             if let Ok(v) = e.value().parse() {
@@ -560,7 +576,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                     }
                                     input {
                                         r#type: "number",
-                                        value: "16",
+                                        value: "{roi_height}",
                                         class: "border rounded px-2 py-1 text-xs",
                                         oninput: move |e| {
                                             if let Ok(v) = e.value().parse() {
@@ -577,7 +593,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                     }
                                     input {
                                         r#type: "number",
-                                        value: "1",
+                                        value: "{block_width}",
                                         class: "border rounded px-2 py-1 text-xs",
                                         oninput: move |e| {
                                             if let Ok(v) = e.value().parse() {
@@ -594,7 +610,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                     }
                                     input {
                                         r#type: "number",
-                                        value: "1",
+                                        value: "{block_height}",
                                         class: "border rounded px-2 py-1 text-xs",
                                         oninput: move |e| {
                                             if let Ok(v) = e.value().parse() {
@@ -611,7 +627,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                     }
                                     input {
                                         r#type: "number",
-                                        value: "16",
+                                        value: "{range_max}",
                                         class: "border rounded px-2 py-1 text-xs",
                                         oninput: move |e| {
                                             if let Ok(v) = e.value().parse() {
@@ -628,7 +644,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                     }
                                     input {
                                         r#type: "number",
-                                        value: "16",
+                                        value: "{range_min}",
                                         class: "border rounded px-2 py-1 text-xs",
                                         oninput: move |e| {
                                             if let Ok(v) = e.value().parse() {
@@ -663,52 +679,53 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                             }
                             button {
                                 onclick: move |_| {
-                                    let project_form_data = serde_json::json!({
-                                        "name": project_name.read().to_string(),
-                                        "platform": platform.read().to_string(),
-                                        "interface": project_type.read().to_string(),
-                                        "type": "vision".to_string(),
-                                        "description": description.read().to_string(),
-                                        "created_at": utc_iso,
-                                        "updated_at": utc_iso,
-                                        "categories": categories.read().iter().enumerate().map(|(i, (name, color))| {
-                                            serde_json::json!({
-                                                "id": i + 1,
-                                                "name": name,
-                                                "color": color,
-                                                "context_id": i + 1 // just as an example
-                                            })
-                                        }).collect::<Vec<_>>(),
-                                        "feature_extraction": {
-                                            "algorithm": algorithm.read().to_string(),
-                                            "normalized": *normalized.read(),
-                                            "roi_width": *roi_width.read(),
-                                            "roi_height": *roi_height.read(),
-                                            "block_width": *block_width.read(),
-                                            "block_height": *block_height.read(),
-                                            "if_field_range": {
-                                                "min": *range_min.read(),
-                                                "max": *range_max.read()
+                                    let id = Uuid::new_v4().to_string();
+                                    if props.project.is_none(){
+                                        let project_form_data = serde_json::json!({
+                                            "id": id,
+                                            "name": project_name.read().to_string(),
+                                            "platform": platform.read().to_string(),
+                                            "interface": project_type.read().to_string(),
+                                            "type": "vision".to_string(),
+                                            "description": description.read().to_string(),
+                                            "created_at": utc_iso,
+                                            "updated_at": utc_iso,
+                                            "categories": categories.read().iter().map(|cat| {
+                                                serde_json::json!({
+                                                    "id": cat.id,
+                                                    "name": cat.name,
+                                                    "color": cat.color,
+                                                    "context_id": cat.context_id
+                                                })
+                                            }).collect::<Vec<_>>(),
+                                            "feature_extraction": {
+                                                "algorithm": algorithm.read().to_string(),
+                                                "normalized": *normalized.read(),
+                                                "roi_width": *roi_width.read(),
+                                                "roi_height": *roi_height.read(),
+                                                "block_width": *block_width.read(),
+                                                "block_height": *block_height.read(),
+                                                "if_field_range": {
+                                                    "min": *range_min.read(),
+                                                    "max": *range_max.read()
+                                                }
                                             }
-                                        }
-                                    });
-                            
-                                    // Print or send project_form_data somewhere
-                                    // println!("{:#?}", project_form_data);
-
-                                    let deserialized: Result<Project, _> = serde_json::from_value(project_form_data);
-                                    println!("{:#?}", deserialized);
-                                    match deserialized {
-                                        Ok(project) => {
-                                            match add_project(project) {
-                                                Ok(_) => println!("Project added successfully."),
-                                                Err(e) => eprintln!("Error adding project: {}", e),
+                                        });
+                                        let deserialized: Result<Project, _> = serde_json::from_value(project_form_data);
+                                        // println!("{:#?}", deserialized);
+                                        match deserialized {
+                                            Ok(project) => {
+                                                match add_project(project) {
+                                                    Ok(_) => println!("Project added successfully."),
+                                                    Err(e) => eprintln!("Error adding project: {}", e),
+                                                }
+                                            },
+                                            Err(e) => {
+                                                eprintln!("Failed to deserialize project_form_data: {}", e);
                                             }
-                                        },
-                                        Err(e) => {
-                                            eprintln!("Failed to deserialize project_form_data: {}", e);
-                                        }
-                                    }
+                                        }    
+                                    }else {}
+                                   
                                     show_modal.set(false);
                                 },
                                 class: "font-medium text-xs bg-[#101010] text-[#FFFFFF] rounded-[3px] px-4 py-1",

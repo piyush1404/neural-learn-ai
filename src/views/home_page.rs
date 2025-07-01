@@ -55,85 +55,85 @@ pub fn HomePage() -> Element {
     // println!("Visible projects: {:#?}", visible_projects);
 
     // Tab management logic (unchanged)
-    let mut tabs = use_signal(|| {
-        vec![Tab {
-            id: 1,
-            title: "Home".to_string(),
-            active: true,
-        }]
-    });
-    let next_id = use_signal(|| 2);
+    // let mut tabs = use_signal(|| {
+    //     vec![Tab {
+    //         id: 1,
+    //         title: "Home".to_string(),
+    //         active: true,
+    //     }]
+    // });
+    // let next_id = use_signal(|| 2);
 
-    let add_tab = {
-        to_owned![tabs, next_id];
-        move |_| {
-            tabs.write().iter_mut().for_each(|t| t.active = false);
-            tabs.write().push(Tab {
-                id: next_id(),
-                title: format!("Tab {}", next_id()),
-                active: true,
-            });
-            next_id.set(next_id() + 1);
-        }
-    };
+    // let add_tab = {
+    //     to_owned![tabs, next_id];
+    //     move |_| {
+    //         tabs.write().iter_mut().for_each(|t| t.active = false);
+    //         tabs.write().push(Tab {
+    //             id: next_id(),
+    //             title: format!("Tab {}", next_id()),
+    //             active: true,
+    //         });
+    //         next_id.set(next_id() + 1);
+    //     }
+    // };
 
-    let mut activate_tab = {
-        to_owned![tabs];
-        move |id| {
-            tabs.write().iter_mut().for_each(|t| t.active = t.id == id);
-        }
-    };
+    // let mut activate_tab = {
+    //     to_owned![tabs];
+    //     move |id| {
+    //         tabs.write().iter_mut().for_each(|t| t.active = t.id == id);
+    //     }
+    // };
 
-    let mut close_tab = {
-        to_owned![tabs];
-        move |id| {
-            let mut new_list: Vec<Tab> = tabs().into_iter().filter(|t| t.id != id).collect();
-            if !new_list.iter().any(|t| t.active) {
-                if let Some(first) = new_list.first_mut() {
-                    first.active = true;
-                }
-            }
-            tabs.set(new_list);
-        }
-    };
+    // let mut close_tab = {
+    //     to_owned![tabs];
+    //     move |id| {
+    //         let mut new_list: Vec<Tab> = tabs().into_iter().filter(|t| t.id != id).collect();
+    //         if !new_list.iter().any(|t| t.active) {
+    //             if let Some(first) = new_list.first_mut() {
+    //                 first.active = true;
+    //             }
+    //         }
+    //         tabs.set(new_list);
+    //     }
+    // };
 
-    let rendered_tabs = tabs()
-        .clone()
-        .into_iter()
-        .map(|tab| {
-            let (bg_class, border_class, text_class, z_class) = if tab.active {
-                (
-                    "bg-[#e0e0e0] hover:bg-[#d0d0d0]",
-                    "border-x border-t border-gray-300",
-                    "text-black",
-                    "z-10",
-                )
-            } else {
-                ("bg-white", "border border-transparent", "text-gray-600", "z-0")
-            };
+    // let rendered_tabs = tabs()
+    //     .clone()
+    //     .into_iter()
+    //     .map(|tab| {
+    //         let (bg_class, border_class, text_class, z_class) = if tab.active {
+    //             (
+    //                 "bg-[#e0e0e0] hover:bg-[#d0d0d0]",
+    //                 "border-x border-t border-gray-300",
+    //                 "text-black",
+    //                 "z-10",
+    //             )
+    //         } else {
+    //             ("bg-white", "border border-transparent", "text-gray-600", "z-0")
+    //         };
 
-            let class_name = format!(
-                "relative px-4 py-1 flex items-center gap-2 text-sm rounded-t-md cursor-pointer min-w-[100px] flex-shrink-0 {bg_class} {border_class} {text_class} {z_class} -mb-px select-none"
-            );
+    //         let class_name = format!(
+    //             "relative px-4 py-1 flex items-center gap-2 text-sm rounded-t-md cursor-pointer min-w-[100px] flex-shrink-0 {bg_class} {border_class} {text_class} {z_class} -mb-px select-none"
+    //         );
 
-            rsx! {
-                div {
-                    key: "{tab.id}",
-                    class: "{class_name}",
-                    onclick: move |_| activate_tab(tab.id),
-                    "{tab.title}",
-                    button {
-                        class: "ml-2 text-gray-800 hover:text-red-500",
-                        onclick: move |evt| {
-                            evt.stop_propagation();
-                            close_tab(tab.id);
-                        },
-                        "×"
-                    }
-                }
-            }
-        })
-        .collect::<Vec<_>>();
+    //         rsx! {
+    //             div {
+    //                 key: "{tab.id}",
+    //                 class: "{class_name}",
+    //                 onclick: move |_| activate_tab(tab.id),
+    //                 "{tab.title}",
+    //                 button {
+    //                     class: "ml-2 text-gray-800 hover:text-red-500",
+    //                     onclick: move |evt| {
+    //                         evt.stop_propagation();
+    //                         close_tab(tab.id);
+    //                     },
+    //                     "×"
+    //                 }
+    //             }
+    //         }
+    //     })
+    //     .collect::<Vec<_>>();
 
     // test_add_project();
     // test_get_projects_by_name();
@@ -143,18 +143,18 @@ pub fn HomePage() -> Element {
     let page_info = format!("{:02}/{:02}", current_page() + 1, total_pages);
 
     rsx! {
-        div {
-            class: "relative border-b border-gray-300 flex items-end space-x-1",
-            div {
-                class: "flex overflow-x-auto whitespace-nowrap no-scrollbar",
-                {rendered_tabs.into_iter()}
-            }
-            button {
-                class: "w-6 h-6 mb-[1px] bg-gray-200 hover:bg-gray-300 rounded-full text-gray-700 text-lg flex items-center justify-center flex-shrink-0",
-                onclick: add_tab,
-                "+"
-            }
-        }
+        // div {
+        //     class: "relative border-b border-gray-300 flex items-end space-x-1",
+        //     div {
+        //         class: "flex overflow-x-auto whitespace-nowrap no-scrollbar",
+        //         {rendered_tabs.into_iter()}
+        //     }
+        //     button {
+        //         class: "w-6 h-6 mb-[1px] bg-gray-200 hover:bg-gray-300 rounded-full text-gray-700 text-lg flex items-center justify-center flex-shrink-0",
+        //         onclick: add_tab,
+        //         "+"
+        //     }
+        // }
         div {
             class: "flex flex-col w-full border border-[#BEBEBE] rounded-lg mt-1",
             div {
@@ -249,10 +249,11 @@ pub fn HomePage() -> Element {
                 visible_projects.into_iter().map(|project| {
                     rsx! {
                         ProjectCard {
+                            id: project.id,
                             name: project.name.clone(),
-                            platform: project.platform.clone().unwrap_or("Unknown".to_string()),
-                            interface: project.interface.clone().unwrap_or("Unknown".to_string()),
-                            description: project.description.unwrap_or("Unknown".to_string()),
+                            platform: project.platform.clone(),
+                            interface: project.interface.clone(),
+                            description: project.description,
                             created_at: project.created_at.unwrap_or("Unknown".to_string()),
                             updated_at: project.updated_at.unwrap_or("Unknown".to_string()),
                             neurons: project.neurons.clone().map(|n| n)

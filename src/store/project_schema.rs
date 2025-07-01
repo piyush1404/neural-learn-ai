@@ -2,16 +2,17 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
 pub struct Project {
+    pub id: String,
     pub name: String,
-    pub platform: Option<String>,
-    pub interface: Option<String>,
-    pub r#type: Option<String>,
-    pub description: Option<String>,
+    pub platform: String,
+    pub interface: String,
+    pub r#type:String,
+    pub description: String,
     pub created_at: Option<String>,
     pub updated_at: Option<String>,
     pub files: Option<Vec<FileInfo>>,
     pub neurons: Option<NeuronConfig>,
-    pub categories: Option<Vec<Category>>,
+    pub categories: Vec<Category>,
     pub feature_extraction: Option<FeatureExtraction>,
     pub learn_properties: Option<LearnProperties>,
     pub recognize_properties: Option<RecognizeProperties>,

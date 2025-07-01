@@ -1,9 +1,13 @@
-use crate::store::project_schema::NeuronConfig;
+use crate::{components::project_form::ProjectForm, store::project_schema::NeuronConfig};
 use dioxus::prelude::*;
 
 use crate::date_format::format_date_mmddyyyy;
+
+use crate::store::project::get_project_by_id;
+
 #[component]
 pub fn ProjectCard(
+    id: String,
     name: String,
     platform: String,
     interface: String,
@@ -12,6 +16,11 @@ pub fn ProjectCard(
     updated_at: String,
     neurons: Option<NeuronConfig>,
 ) -> Element {
+
+    let project = get_project_by_id(&id).unwrap();
+    let project = project.clone();
+    println!("Project: {:#?}", project);
+
     let (min_if, max_if, search_area_str, total_neurons, committed_neurons) =
         if let Some(n) = &neurons {
             (
@@ -90,9 +99,11 @@ pub fn ProjectCard(
 
     let mut hovered = use_signal(|| false);
 
+    let mut show_edit_modal = use_signal(|| false);
+
     rsx! {
         div {
-            onmouseenter: move |_| hovered.set(true),
+            // onmouseenter: move |_| hovered.set(true),
             onmouseleave: move |_| hovered.set(false),
             class: "transition-all duration-300",
             if hovered() {
@@ -152,7 +163,10 @@ pub fn ProjectCard(
             } else {
                 // ORIGINAL VIEW (what you already had)
                 div {
-                        class: "h-full relative group border border-[#BEBEBE] hover:border-[#A0A0A0] rounded-xl p-[15px] shadow-sm hover:shadow-md hover:scale-[1.01] cursor-pointer transition-all duration-200 flex flex-col gap-1",
+                    class: "h-full relative group border border-[#BEBEBE] hover:border-[#A0A0A0] rounded-xl p-[15px] shadow-sm hover:shadow-md hover:scale-[1.01] cursor-pointer transition-all duration-200 flex flex-col gap-1",
+                    div {  
+                            onmouseenter: move |_| hovered.set(true),
+                            onmouseleave: move |_| hovered.set(false),
                         // Header with icon and name
                         div {
                             class: "flex items-center gap-3",
@@ -273,14 +287,13 @@ pub fn ProjectCard(
                         }
 
                         hr { class: "border-t border-gray-200 my-1" }
-
-                        // Footer actions
+                        } 
+                    // Footer actions
+                    div {
+                        class: "flex justify-between items-center",
                         div {
-                            class: "flex justify-between items-center",
-
-                            div {
-                                // class: "text-green-700 text-xl",
-                                svg {
+                            // class: "text-green-700 text-xl",
+                            svg {
                                     width: "18",
                                     height: "18",
                                     view_box: "0 0 18 18",
@@ -292,7 +305,6 @@ pub fn ProjectCard(
                                     }
                                 }
                             }
-
                             div {
                                 class: "flex gap-[10px]",
                                 button {
@@ -300,12 +312,20 @@ pub fn ProjectCard(
                                     "Delete"
                                 }
                                 button {
+                                    onclick: move |_| show_edit_modal.set(true),
                                     class: "bg-[#101010] px-[10px] py-1 rounded-[3px] text-xs font-medium text-[#FFFFFF] ",
                                     "Edit"
                                 }
                             }
                         }
 
+                    }
+
+                    if *show_edit_modal.read() {
+                        ProjectForm {
+                            show_modal: show_edit_modal,
+                            project: project.clone(),
+                        }
                     }
 
             }

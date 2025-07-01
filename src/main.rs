@@ -32,11 +32,10 @@ fn App() -> Element {
 
         div {
             class: "w-full h-full bg-white font-poppins px-7",
-            // ChromeStyleNavbar {}
 
-            // HomePage {}
+            HomePage {}
 
-            ProjectDetails {}
+            // ProjectDetails {}
 
         }
 

@@ -38,6 +38,11 @@ pub fn get_projects_by_name(query: &str) -> Vec<Project> {
         .collect()
 }
 
+
+/// Get a project by id 
+pub fn get_project_by_id(id: &str) -> Option<Project> {
+    load_projects().into_iter().find(|p| p.id == id)    
+}
 /// Add a new project
 pub fn add_project(project: Project) -> std::io::Result<()> {
     let mut projects = load_projects();

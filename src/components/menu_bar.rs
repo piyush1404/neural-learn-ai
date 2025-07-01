@@ -4,7 +4,6 @@ use crate::components::{knowledge_modal::KnowledgeModal, option_annotations::Opt
 
 #[component]
 pub fn MenuBar() -> Element {
-
     let mut selected_annotation = use_signal(|| "".to_string());
     let mut show_modal_options = use_signal(|| false);
     let mut selected_knowledge = use_signal(|| "".to_string());
@@ -59,7 +58,7 @@ pub fn MenuBar() -> Element {
             div {
                 class:"w-full flex items-center justify-end gap-4",
                 select {
-                    class: "px-3 py-1 font-normal text-[11px] text-[#555555] appearance-none pr-7",
+                    class: "px-3 py-1 font-normal text-[11px] text-[#555555] appearance-none pr-5",
                     value: "{selected_annotation}",
 
                     style: r#"
