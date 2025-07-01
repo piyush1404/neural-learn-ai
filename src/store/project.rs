@@ -60,9 +60,10 @@ pub fn add_project(project: Project) -> std::io::Result<()> {
 }
 
 /// Update an existing project by name
-pub fn update_project(name: &str, updated_project: Project) -> std::io::Result<()> {
+pub fn update_project(id: &str, updated_project: Project) -> std::io::Result<()> {
+    println!("Updating project with id: {}", id);
     let mut projects = load_projects();
-    if let Some(pos) = projects.iter().position(|p| p.name == name) {
+    if let Some(pos) = projects.iter().position(|p| p.id == id) {
         projects[pos] = updated_project;
         save_projects(&projects)
     } else {

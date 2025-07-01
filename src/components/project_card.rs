@@ -19,7 +19,7 @@ pub fn ProjectCard(
 
     let project = get_project_by_id(&id).unwrap();
     let project = project.clone();
-    println!("Project: {:#?}", project);
+    // println!("Project: {:#?}", project);
 
     let (min_if, max_if, search_area_str, total_neurons, committed_neurons) =
         if let Some(n) = &neurons {
@@ -163,7 +163,7 @@ pub fn ProjectCard(
             } else {
                 // ORIGINAL VIEW (what you already had)
                 div {
-                    class: "h-full relative group border border-[#BEBEBE] hover:border-[#A0A0A0] rounded-xl p-[15px] shadow-sm hover:shadow-md hover:scale-[1.01] cursor-pointer transition-all duration-200 flex flex-col gap-1",
+                    class: "w-[270px] h-full relative group border border-[#BEBEBE] hover:border-[#A0A0A0] rounded-xl p-[15px] shadow-sm hover:shadow-md hover:scale-[1.01] cursor-pointer transition-all duration-200 flex flex-col gap-1",
                     div {  
                             onmouseenter: move |_| hovered.set(true),
                             onmouseleave: move |_| hovered.set(false),

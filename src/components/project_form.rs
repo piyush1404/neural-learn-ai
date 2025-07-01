@@ -1,7 +1,9 @@
+use chrono::Utc;
+use dioxus::html::a::r#type;
 use dioxus::prelude::*;
 use uuid::Uuid;
 use crate::store::project_schema::{ Project, Category};
-use crate::store::project::{ add_project };
+use crate::store::project::{ self, add_project, update_project };
 use crate::date_format::{get_local_and_utc_iso};
 #[derive(PartialEq, Props, Clone)]
 pub struct ProjectFormProps {
@@ -24,7 +26,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
     let mut project_name = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().name.clone() } else { "".to_string() });
     let mut project_name_error=use_signal(|| false);
     let mut platform = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().platform.clone() } else { "Simulation".to_string() });
-    let project_type = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().interface.clone() } else { "image".to_string() });
+    // let mut project_type = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().interface.clone() } else { "Image".to_string() });
 
     let mut description = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().description.clone() } else { "".to_string() });
     let mut description_error=use_signal(|| false);
@@ -685,7 +687,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                             "id": id,
                                             "name": project_name.read().to_string(),
                                             "platform": platform.read().to_string(),
-                                            "interface": project_type.read().to_string(),
+                                            "interface": selected_label.read().to_string(),
                                             "type": "vision".to_string(),
                                             "description": description.read().to_string(),
                                             "created_at": utc_iso,
@@ -724,7 +726,88 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                                 eprintln!("Failed to deserialize project_form_data: {}", e);
                                             }
                                         }    
-                                    }else {}
+                                    }else {
+                                        let id = props.project.as_ref().unwrap().id.clone();
+
+                                        use serde_json::{json, Map, Value};
+                                        let mut patch_payload = Map::new();
+
+                                        let id_clone = id.clone();
+                                        patch_payload.insert("id".to_string(), Value::String(id_clone));
+
+                                        let name = project_name.read().to_string();
+                                        if !name.trim().is_empty() {
+                                            patch_payload.insert("name".to_string(), Value::String(name));
+                                        }
+
+                                        let platform = platform.read().to_string();
+                                        if !platform.trim().is_empty() {
+                                            patch_payload.insert("platform".to_string(), Value::String(platform));
+                                        }
+
+                                        let interface = selected_label.read().to_string();
+                                        if !interface.trim().is_empty() {
+                                            patch_payload.insert("interface".to_string(), Value::String(interface));
+                                        }
+
+                                        let project_type = props.project.as_ref().unwrap().r#type.clone();
+                                        if !project_type.trim().is_empty() {
+                                            patch_payload.insert("type".to_string(), Value::String(project_type));
+                                        }
+
+                                        let description = description.read().to_string();
+                                        if !description.trim().is_empty() {
+                                            patch_payload.insert("description".to_string(), Value::String(description));
+                                        }
+
+                                        let categories = categories.read().iter().map(|cat| {
+                                            json!({
+                                                "id": cat.id,
+                                                "name": cat.name,
+                                                "color": cat.color,
+                                                "context_id": cat.context_id
+                                            })
+                                        }).collect::<Vec<_>>();
+                                        if !categories.is_empty() {
+                                            patch_payload.insert("categories".to_string(), Value::Array(categories));
+                                        }
+
+                                        let feature_extraction = json!({
+                                            "algorithm": algorithm.read().to_string(),
+                                            "normalized": *normalized.read(),
+                                            "roi_width": *roi_width.read(),
+                                            "roi_height": *roi_height.read(),
+                                            "block_width": *block_width.read(),
+                                            "block_height": *block_height.read(),
+                                            "if_field_range": {
+                                                "min": *range_min.read(),
+                                                "max": *range_max.read()
+                                            }
+                                        });
+                                        if !feature_extraction.is_null() {
+                                            patch_payload.insert("feature_extraction".to_string(), feature_extraction);
+                                        }
+
+                                        let utc_iso = Utc::now().to_rfc3339();
+                                        patch_payload.insert("updated_at".to_string(), Value::String(utc_iso));
+
+                                        // println!("{:#?}", patch_payload);
+
+                                        let deserialized: Result<Project, _> = serde_json::from_value(Value::Object(patch_payload));
+                                        println!("{:#?}", deserialized);
+                                        match deserialized {
+                                            Ok(project) => {
+                                                match update_project(&id, project) {
+                                                    Ok(_) => println!("Project updated successfully."),
+                                                    Err(e) => eprintln!("Error updating project: {}", e),
+                                                }
+                                            },
+                                            Err(e) => {
+                                                eprintln!("Failed to deserialize project_form_data: {}", e);
+                                            }
+                                        }
+
+                                    }
                                    
                                     show_modal.set(false);
                                 },

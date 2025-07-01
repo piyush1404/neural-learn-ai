@@ -168,12 +168,12 @@ pub fn HomePage() -> Element {
                         label {
                             class: "flex items-center gap-2 cursor-pointer",
                             input { r#type: "radio", name: "filter", value: "all", checked: true,
-                            class: "w-[20px] h-[20px] border-2 rounded-full focus:outline-none" }
+                            class: "w-5 h-5 border-2 rounded-full accent-[#0387D9]" }
                             span { class: "text-[#151515] text-xs font-light", "All" }
                         }
                         label {
                             class: "flex items-center gap-2 cursor-pointer",
-                            input { r#type: "radio", name: "filter", value: "complete", class: "w-[20px] h-[20px] border-2 rounded-full focus:outline-none"}
+                            input { r#type: "radio", name: "filter", value: "complete",  class: "w-5 h-5 border-2 rounded-full accent-[#0387D9]"}
                             svg {
                                 width: "18",
                                 height: "18",
@@ -190,7 +190,7 @@ pub fn HomePage() -> Element {
                         }
                         label {
                             class: "flex items-center gap-2 cursor-pointer",
-                            input { r#type: "radio", name: "filter", value: "incomplete", class: "w-[20px] h-[20px] border-2 rounded-full focus:outline-none" }
+                            input { r#type: "radio", name: "filter", value: "incomplete", class: "w-5 h-5 border-2 rounded-full accent-[#0387D9]" }
                             svg {
                                 width: "18",
                                 height: "18",
