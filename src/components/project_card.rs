@@ -109,7 +109,7 @@ pub fn ProjectCard(
             if hovered() {
                 // HOVERED VIEW (Styled like the attached image)
                 div {
-                    class: "relative group min-h-full bg-[#D9D9D9] border border-[#BEBEBE] hover:border-[#A0A0A0] rounded-xl p-[15px] shadow-sm hover:shadow-md hover:scale-[1.01] cursor-pointer transition-all duration-200 flex flex-col gap-1",
+                    class: "w-[270px] h-[203px] relative group min-h-full bg-[#D9D9D9] border border-[#BEBEBE] hover:border-[#A0A0A0] rounded-xl p-[15px] shadow-sm hover:shadow-md hover:scale-[1.01] cursor-pointer transition-all duration-200 flex flex-col gap-1",
                     // Header with icon and name
                     div {
                         class: "flex items-center gap-3",
@@ -147,7 +147,7 @@ pub fn ProjectCard(
 
                     // Description Card
                     div {
-                        class: "min-h-[160px] max-h-[160px] bg-[#FFFFFF] rounded-t-[14px] p-3 -mb-[15px] shadow-[0_4px_6px_0_#00000040]",
+                        class: "w-[240px] min-h-[130px] bg-[#FFFFFF] rounded-t-[14px] p-3 -mb-[15px] shadow-[0_4px_6px_0_#00000040]",
 
                         div {
                             class: "text-xs text-[#404040] mb-1",
@@ -163,7 +163,7 @@ pub fn ProjectCard(
             } else {
                 // ORIGINAL VIEW (what you already had)
                 div {
-                    class: "w-[270px] h-full relative group border border-[#BEBEBE] hover:border-[#A0A0A0] rounded-xl p-[15px] shadow-sm hover:shadow-md hover:scale-[1.01] cursor-pointer transition-all duration-200 flex flex-col gap-1",
+                    class: "w-[270px] h-[203px] relative group border border-[#BEBEBE] hover:border-[#A0A0A0] rounded-xl p-[15px] shadow-sm hover:shadow-md hover:scale-[1.01] cursor-pointer transition-all duration-200 flex flex-col gap-1",
                     div {  
                             onmouseenter: move |_| hovered.set(true),
                             onmouseleave: move |_| hovered.set(false),

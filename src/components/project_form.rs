@@ -812,7 +812,13 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                     show_modal.set(false);
                                 },
                                 class: "font-medium text-xs bg-[#101010] text-[#FFFFFF] rounded-[3px] px-4 py-1",
-                                "Start",
+                                {
+                                    if props.project.is_none() {
+                                        rsx!("Start")
+                                    } else {
+                                        rsx!("Update")
+                                    }
+                                }
                             }
                         }
                     }

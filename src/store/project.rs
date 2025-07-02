@@ -8,10 +8,22 @@ const PROJECT_FILE_PATH: &str = "assets/realistic_projects.json";
 
 /// Load all projects from the file
 pub fn load_projects() -> Vec<Project> {
-    File::open(PROJECT_FILE_PATH)
-        .ok()
-        .map(|f| serde_json::from_reader(BufReader::new(f)).unwrap_or_default())
-        .unwrap_or_default()
+    match File::open(PROJECT_FILE_PATH) {
+        Ok(file) => {
+            let reader = BufReader::new(file);
+            match serde_json::from_reader(reader) {
+                Ok(data) => data,
+                Err(e) => {
+                    eprintln!("❌ JSON parse error: {}", e);
+                    Vec::new()
+                }
+            }
+        }
+        Err(e) => {
+            eprintln!("❌ Failed to open file: {}", e);
+            Vec::new()
+        }
+    }
 }
 
 /// Save all projects to the file
