@@ -1,0 +1,62 @@
+application_types:
+  - vision
+  - audio
+  - smell
+
+platforms:
+  - simulator
+  - nm500
+  - brilliant
+
+learning_modes:
+  - annotations
+
+output_modes:
+  - object
+
+project:
+  default_project_name: "My Project"
+  default_path: "/home/user/projects"
+  upload_path: "/home/user/uploads"
+
+vision:
+  settings:
+    default_platform: simulator
+    default_algorithm: subsample
+    roi:
+      width: 16
+      height: 16
+    block:
+      width: 1
+      height: 1
+    if_field_range:
+      min: 2
+      max: 16565
+
+  feature_extraction:
+    algorithms:
+      - subsample
+      - histogram
+      - histo_cumulative
+      - subsample_rgb
+      - horizontal_profile
+      - vertical_profile
+      - composite_profile
+      - histo_rgb
+      - histo_rgb_cumulative
+
+  learn_properties:
+    mode: "annotations"
+    step_xy:
+      x: 1
+      y: 1
+
+  recognize_properties:
+    output_mode: "object"
+    step_xy:
+      x: 1
+      y: 1
+    skip_xy:
+      x: 1
+      y: 1
+    show_mode: "box"

@@ -1,14 +1,11 @@
-pub mod chrome_style_navbar;
 pub mod new_project_card;
 pub mod project_card;
-pub mod project_details;
 pub mod top_bar;
-
-pub mod collapsible_image;
-pub mod image_upload;
-
 pub mod learn;
 pub mod menu_bar;
 pub mod recognize;
 pub mod setting;
 pub mod tabs;
+pub mod project_form;
+pub mod knowledge_modal;
+pub mod option_annotations;

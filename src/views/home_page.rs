@@ -4,15 +4,18 @@ use std::fs;
 use crate::components::new_project_card::NewProjectCard;
 use crate::components::project_card::ProjectCard;
 
-use crate::project_store::{
-    add_project, delete_project, get_projects_by_name, load_projects, update_project, Project,
+use crate::store::project::{
+    add_project, delete_project, get_projects_by_name, load_projects, update_project, 
 };
+use crate::store::project_schema::Project;
 
 const PAGE_SIZE: usize = 7;
 
 #[component]
 pub fn HomePage() -> Element {
     let projects = use_signal(|| load_projects());
+
+    println!("Projects: {:#?}", projects());
 
     let mut current_page = use_signal(|| 0);
 
@@ -65,12 +68,12 @@ pub fn HomePage() -> Element {
                         label {
                             class: "flex items-center gap-2 cursor-pointer",
                             input { r#type: "radio", name: "filter", value: "all", checked: true,
-                            class: "w-[20px] h-[20px] border-2 rounded-full focus:outline-none" }
+                            class: "w-5 h-5 border-2 rounded-full accent-[#0387D9]" }
                             span { class: "text-[#151515] text-xs font-light", "All" }
                         }
                         label {
                             class: "flex items-center gap-2 cursor-pointer",
-                            input { r#type: "radio", name: "filter", value: "complete", class: "w-[20px] h-[20px] border-2 rounded-full focus:outline-none"}
+                            input { r#type: "radio", name: "filter", value: "complete",  class: "w-5 h-5 border-2 rounded-full accent-[#0387D9]"}
                             svg {
                                 width: "18",
                                 height: "18",
@@ -87,7 +90,7 @@ pub fn HomePage() -> Element {
                         }
                         label {
                             class: "flex items-center gap-2 cursor-pointer",
-                            input { r#type: "radio", name: "filter", value: "incomplete", class: "w-[20px] h-[20px] border-2 rounded-full focus:outline-none" }
+                            input { r#type: "radio", name: "filter", value: "incomplete", class: "w-5 h-5 border-2 rounded-full accent-[#0387D9]" }
                             svg {
                                 width: "18",
                                 height: "18",
@@ -146,12 +149,13 @@ pub fn HomePage() -> Element {
                 visible_projects.into_iter().map(|project| {
                     rsx! {
                         ProjectCard {
+                            id: project.id,
                             name: project.name.clone(),
                             platform: project.platform.clone(),
                             interface: project.interface.clone(),
-                            description: project.description.clone(),
-                            created_at: project.created_at.clone(),
-                            updated_at: project.updated_at.clone(),
+                            description: project.description,
+                            created_at: project.created_at.unwrap_or("Unknown".to_string()),
+                            updated_at: project.updated_at.unwrap_or("Unknown".to_string()),
                             neurons: project.neurons.clone().map(|n| n)
                         }
                     }
