@@ -1,7 +1,13 @@
 use dioxus::prelude::*;
+use crate::components::project_details::{AppState, SharedData};
+
 
 #[component]
-pub fn Setting() -> Element {
+pub fn Setting(app_state: AppState) -> Element {
+    let mut shared = app_state.shared;
+    let shared_props = shared().clone();
+
+    let mut color_mode = use_signal(|| "grayscale".to_string());
     rsx! {
         div {
             class:"flex gap-2 bg-[#CAEAD7] mx-[13px] my-[14px] px-[30px] py-[10px] rounded-[10px] ",
@@ -163,10 +169,15 @@ pub fn Setting() -> Element {
                     background-position: right 0.75rem center;
                     background-size: 10px 6px;
                 "#,
-                    option { value: "", disabled: true, selected: true, }
-                    option { value: "web", "Web" }
-                    option { value: "mobile", "Mobile" }
-                    option { value: "desktop", "Desktop" }
+                    onchange: move |evt| {
+                        color_mode.set(evt.value().to_string());
+                        shared.set(SharedData {
+                            algorithm: evt.value().to_string(),
+                            clear_clicked: shared_props.clear_clicked.clone(),
+                        });
+                    },
+                    option { value: "grayscale", "Grayscale" }
+                    option { value: "rgb", "RGB" }
                 }
             }
 

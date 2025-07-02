@@ -11,3 +11,4 @@ pub mod learn;
 pub mod menu_bar;
 pub mod recognize;
 pub mod setting;
+pub mod tabs;

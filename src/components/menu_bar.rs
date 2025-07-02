@@ -1,7 +1,10 @@
 use dioxus::prelude::*;
+use crate::components::project_details::{AppState, SharedData};
 
 #[component]
-pub fn MenuBar() -> Element {
+pub fn MenuBar(app_state: AppState) -> Element {
+    let mut shared = app_state.shared;
+    let shared_props = shared().clone();
     rsx! {
         div {
             class:"h-[40px] flex items-center gap-2 mx-6",
@@ -140,6 +143,13 @@ pub fn MenuBar() -> Element {
                     }
 
                     button {
+                        onclick: move |evt| {
+                            evt.prevent_default();
+                            shared.set(SharedData {
+                                algorithm: shared_props.algorithm.clone(),
+                                clear_clicked: true
+                            });
+                        },
                         class: "ml-2 outline-none border-none bg-transparent font-normal text-xs text-[#555555]",
                         "Clear"
                     }

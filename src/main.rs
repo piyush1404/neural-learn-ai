@@ -1,48 +1,107 @@
 use dioxus::desktop::{Config, WindowBuilder};
 use dioxus::prelude::*;
 use dioxus::LaunchBuilder;
-
 const MAIN_CSS: Asset = asset!("/assets/main.css");
 const TAILWIND_CSS: Asset = asset!("/assets/tailwind.css");
 
+mod state;
 mod components;
 mod date_format;
 mod project_store;
 mod views;
 
+use components::tabs::Tabs;
+use state::tabs::TabContext;
 use components::chrome_style_navbar::ChromeStyleNavbar;
 use components::collapsible_image::CollapsibleImage;
 use components::project_details::ProjectDetails;
 use components::top_bar::TopBar;
 use views::home_page::HomePage;
 use views::project_grid::ProjectGrid;
-
 fn main() {
     LaunchBuilder::new()
         .with_cfg(
             Config::default()
                 .with_window(WindowBuilder::new().with_title("Neuron Learn AI"))
-                .with_menu(None),
         )
-        .launch(App);
+        .launch(app);
 }
 
-#[component]
-fn App() -> Element {
+fn app() -> Element {
+    let tab_context = use_signal(TabContext::new); // ✅ stays persistent
+
+    use_context_provider(|| tab_context.clone());
+
+    let initialized = use_signal(|| false);
+
+    {
+        let mut initialized = initialized.clone();
+        let mut tab_context = tab_context.clone();
+        use_effect(move || {
+            if !*initialized.read() {
+                println!("Adding Home tab once");
+
+                tab_context.write().add_tab(
+                    "Home",
+                    rsx! { crate::views::home_page::HomePage {} },
+                    Some(rsx! {
+                        svg {
+                            width: "14",
+                            height: "14",
+                            view_box: "0 0 14 14",
+                            fill: "none",
+                            xmlns: "http://www.w3.org/2000/svg",
+                            path {
+                                d: "M13.65 6.06199C13.6496 6.06167 13.6493 6.06124 13.649 6.06092L7.93805 0.350236C7.69462 0.106705 7.37099 -0.0273438 7.02673 -0.0273438C6.68248 -0.0273438 6.35884 0.106705 6.11531 0.350236L0.407394 6.05804C0.405472 6.05996 0.403442 6.06199 0.401626 6.06392C-0.0982525 6.56668 -0.097398 7.3824 0.404083 7.88388C0.633194 8.1131 0.935685 8.24576 1.25922 8.25975C1.27246 8.26103 1.28571 8.26167 1.29906 8.26167H1.52657V12.4643C1.52657 13.296 2.20333 13.9727 3.03507 13.9727H5.26936C5.4959 13.9727 5.67951 13.789 5.67951 13.5625V10.2676C5.67951 9.8881 5.98831 9.57941 6.36781 9.57941H7.68565C8.06516 9.57941 8.37384 9.8881 8.37384 10.2676V13.5625C8.37384 13.789 8.55745 13.9727 8.784 13.9727H11.0183C11.8501 13.9727 12.5268 13.296 12.5268 12.4643V8.26167H12.7378C13.082 8.26167 13.4056 8.12762 13.6493 7.88399C14.1513 7.38176 14.1515 6.56454 13.65 6.06199ZM13.0692 7.304C12.9806 7.39255 12.8629 7.44136 12.7378 7.44136H12.1166C11.8901 7.44136 11.7065 7.62497 11.7065 7.85152V12.4643C11.7065 12.8437 11.3978 13.1524 11.0183 13.1524H9.19415V10.2676C9.19415 9.43585 8.5175 8.7591 7.68565 8.7591H6.36781C5.53596 8.7591 4.8592 9.43585 4.8592 10.2676V13.1524H3.03507C2.65567 13.1524 2.34688 12.8437 2.34688 12.4643V7.85152C2.34688 7.62497 2.16327 7.44136 1.93672 7.44136H1.32619C1.31978 7.44093 1.31348 7.44061 1.30696 7.44051C1.18477 7.43837 1.07016 7.38988 0.984284 7.30389C0.801636 7.12124 0.801636 6.82399 0.984284 6.64123C0.984391 6.64123 0.984391 6.64113 0.984498 6.64102L0.984819 6.6407L6.69551 0.930223C6.78395 0.841676 6.90155 0.79297 7.02673 0.79297C7.15181 0.79297 7.26941 0.841676 7.35795 0.930223L13.0674 6.63952C13.0682 6.64038 13.0692 6.64123 13.07 6.64209C13.2517 6.82506 13.2514 7.12167 13.0692 7.304Z",
+                                fill: "#0387D9",
+                            }
+                        }
+                    }),
+                );
+
+                initialized.set(true);
+
+                // // Print tabs
+                // let ctx = tab_context.read();
+                // let tabs = ctx.tabs.read();
+                // let active_id = ctx.active_tab.read();
+
+                // println!("🧠 Total Tabs (in effect): {}", tabs.len());
+                // println!("⭐ Active Tab ID: {}", active_id);
+                // for (i, tab) in tabs.iter().enumerate() {
+                //     println!("#{}: [{}] {} {:?}", i, tab.id, tab.title, tab.icon);
+                // }
+            }
+            (|| ())()
+        });
+    }
+
+    // Live print
+    let ctx = tab_context.read();
+    let tabs = ctx.tabs.read();
+    let active_id = ctx.active_tab.read();
+
+    // println!("🧠 Total Tabs: {}", tabs.len());
+    // println!("⭐ Active Tab ID: {}", active_id);
+    // for (i, tab) in tabs.iter().enumerate() {
+    //     println!("#{}: [{}] {}", i, tab.id, tab.title);
+    // }
+
     rsx! {
-         document::Stylesheet { rel: "stylesheet", href: MAIN_CSS }
-         style { "{include_str!(\"../assets/tailwind.css\")}" }
+        link { rel: "stylesheet", href: MAIN_CSS }
+        style { "{include_str!(\"../assets/tailwind.css\")}" }
 
         div {
             class: "w-full h-full bg-white font-poppins px-7",
-            // ChromeStyleNavbar {}
+            components::tabs::Tabs {}
 
-            HomePage {}
-
-            // ProjectDetails {}
-
+            match tabs.iter().find(|t| t.id == *ctx.active_tab.read()) {
+                Some(tab) => rsx!(div { class: "mt-4", {tab.content.clone()} }),
+                None => rsx!(div { class: "mt-4 text-gray-500", "No tab selected" })
+            }
         }
-
-
     }
 }
+
+
+

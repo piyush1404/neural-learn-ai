@@ -1,7 +1,319 @@
-use dioxus:: prelude::*;
+use dioxus::prelude::*;
+use opencv::{
+    core::{Mat, Rect, Scalar, Vector},
+    imgcodecs::{imencode, imread, IMREAD_COLOR},
+    imgproc,
+    prelude::*,
+};
+use rfd::FileDialog;
+use base64::{engine::general_purpose::STANDARD, Engine};
+use crate::components::project_details::AppState;
+const RENDERED_IMG_SIZE: i32 = 228;
+
+#[derive(Clone)]
+struct ImageData {
+    original_base64: String,
+    cropped_base64: String,
+    cropped_vec: Vec<u8>,
+    x1: i32,
+    y1: i32,
+    x2: i32,
+    y2: i32,
+    crop_width: i32,
+    crop_height: i32,
+}
+
+#[derive(Clone, Default)]
+struct RectState {
+    start_x: i32,
+    start_y: i32,
+    current_x: i32,
+    current_y: i32,
+    is_drawing: bool,
+}
 
 #[component]
-pub fn Learn() -> Element {
+pub fn Learn(app_state: AppState) -> Element {
+    let mut shared = app_state.shared;
+    println!("state: {:?}", shared().algorithm);
+    println!("state: {:?}", shared().clear_clicked);
+    // let clear_clicked = shared().clear_clicked;
+    let mut image_data = use_signal(|| None as Option<ImageData>);
+    use_effect(move || {
+        if(shared().clear_clicked) {
+            println!("Clearing image data");
+            image_data.set(None);
+            shared.write().clear_clicked = false;
+        }
+    });
+
+    let mat_data = use_signal(|| None as Option<Mat>);
+    let rect_state = use_signal(RectState::default);
+    let mut color_mode = shared().algorithm;
+
+    let load_image = {
+        let mut image_data = image_data.clone();
+        let mut mat_data = mat_data.clone();
+        let mut rect_state = rect_state.clone();
+        move |_| {
+            if let Some(file) = FileDialog::new().add_filter("Image", &["jpg", "png"]).pick_file() {
+                if let Ok(mat) = imread(file.to_str().unwrap(), IMREAD_COLOR) {
+                    let base64 = mat_to_base64(&mat).unwrap();
+                    image_data.set(Some(ImageData {
+                        original_base64: base64,
+                        cropped_base64: "".into(),
+                        cropped_vec: vec![],
+                        x1: 0,
+                        y1: 0,
+                        x2: 0,
+                        y2: 0,
+                        crop_width: 0,
+                        crop_height: 0,
+                    }));
+                    mat_data.set(Some(mat));
+                    rect_state.set(RectState::default());
+                }
+            }
+        }
+    };
+    let onmousedown = {
+        let mut rect_state = rect_state.clone();
+        move |evt: Event<MouseData>| {
+            let coords = evt.data.element_coordinates();
+            let x = coords.x as i32;
+            let y = coords.y as i32;
+            rect_state.set(RectState {
+                is_drawing: true,
+                start_x: x,
+                start_y: y,
+                current_x: x,
+                current_y: y,
+            });
+        }
+    };
+
+    let onmousemove = {
+        let mut rect_state = rect_state.clone();
+        move |evt: Event<MouseData>| {
+            if rect_state.read().is_drawing {
+                let coords = evt.data.element_coordinates();
+                let x = coords.x as i32;
+                let y = coords.y as i32;
+                let prev = rect_state.read().clone();
+                rect_state.set(RectState {
+                    is_drawing: true,
+                    start_x: prev.start_x,
+                    start_y: prev.start_y,
+                    current_x: x,
+                    current_y: y,
+                });
+            }
+        }
+    };
+
+    let onmouseup = {
+        let mut rect_state = rect_state.clone();
+        let mat_data = mat_data.clone();
+        let mut image_data = image_data.clone();
+        let mut color_mode = color_mode.clone();
+        move |_| {
+            let r = rect_state.read().clone();
+
+            if let Some(mat) = &*mat_data.read() {
+                let orig_width = mat.cols();
+                let orig_height = mat.rows();
+
+                let scale_x = orig_width as f64 / RENDERED_IMG_SIZE as f64;
+                let scale_y = orig_height as f64 / RENDERED_IMG_SIZE as f64;
+
+                let x1 = (r.start_x.min(r.current_x) as f64 * scale_x) as i32;
+                let y1 = (r.start_y.min(r.current_y) as f64 * scale_y) as i32;
+                let x2 = (r.start_x.max(r.current_x) as f64 * scale_x) as i32;
+                let y2 = (r.start_y.max(r.current_y) as f64 * scale_y) as i32;
+
+                let width = x2 - x1;
+                let height = y2 - y1;
+
+                if width <= 1 || height <= 1 {
+                    println!("Invalid crop area");
+                    rect_state.set(RectState::default());
+                    return;
+                }
+
+                let mut cloned = mat.clone();
+
+                let rect = Rect::new(x1, y1, width, height);
+                let _ = imgproc::rectangle(
+                    &mut cloned,
+                    rect,
+                    Scalar::new(0.0, 255.0, 0.0, 0.0),
+                    2,
+                    imgproc::LINE_8,
+                    0,
+                );
+
+                if let Ok(cropped_ref) = mat.roi(rect) {
+                    if let Ok(cropped) = cropped_ref.try_clone() {
+                        let is_grayscale = color_mode == "grayscale";
+
+                        let mut processed = Mat::default();
+                        if is_grayscale {
+                            imgproc::cvt_color(&cropped, &mut processed, imgproc::COLOR_BGR2GRAY, 0).unwrap();
+                        } else {
+                            processed = cropped.clone();
+                        }
+
+                        let target_size = if is_grayscale {
+                            opencv::core::Size::new(16, 16)
+                        } else {
+                            opencv::core::Size::new(9, 9)
+                        };
+
+                        let mut resized = Mat::default();
+                        imgproc::resize(&processed, &mut resized, target_size, 0.0, 0.0, imgproc::INTER_AREA).unwrap();
+
+                        let cropped_vec: Vec<u8> = if is_grayscale {
+                            resized.data_bytes().unwrap().to_vec()
+                        } else {
+                            let mut channels = opencv::core::Vector::<Mat>::new();
+                            opencv::core::split(&resized, &mut channels).unwrap();
+                            let r = channels.get(2).unwrap(); // OpenCV uses BGR format
+                            let g = channels.get(1).unwrap();
+                            let b = channels.get(0).unwrap();
+
+                            let r_data = r.data_bytes().unwrap();
+                            let g_data = g.data_bytes().unwrap();
+                            let b_data = b.data_bytes().unwrap();
+
+                            println!("🎨 R Channel (9x9):");
+                            for i in 0..9 {
+                                for j in 0..9 {
+                                    print!("{:3} ", r_data[i * 9 + j]);
+                                }
+                                println!();
+                            }
+
+                            println!("🎨 G Channel (9x9):");
+                            for i in 0..9 {
+                                for j in 0..9 {
+                                    print!("{:3} ", g_data[i * 9 + j]);
+                                }
+                                println!();
+                            }
+
+                            println!("🎨 B Channel (9x9):");
+                            for i in 0..9 {
+                                for j in 0..9 {
+                                    print!("{:3} ", b_data[i * 9 + j]);
+                                }
+                                println!();
+                            }
+
+                            println!("🔗 Combined RGB (9x9):");
+                            for i in 0..9 {
+                                for j in 0..9 {
+                                    let idx = i * 9 + j;
+                                    print!("[{:3},{:3},{:3}] ", r_data[idx], g_data[idx], b_data[idx]);
+                                }
+                                println!();
+                            }
+                            let mut combined = Vec::with_capacity(243);
+                            for i in 0..(9 * 9) {
+                                combined.push(channels.get(2).unwrap().data_bytes().unwrap()[i]);
+                                combined.push(channels.get(1).unwrap().data_bytes().unwrap()[i]);
+                                combined.push(channels.get(0).unwrap().data_bytes().unwrap()[i]);
+                            }
+                            combined
+                        };
+                        // ✅ Add this here to print all 256 grayscale values
+                        if color_mode == "grayscale" {
+                            for row in 0..resized.rows() {
+                                for col in 0..resized.cols() {
+                                    let val = resized.at_2d::<u8>(row, col).unwrap();
+                                    print!("{:3} ", val);
+                                }
+                                println!();
+                            }
+                        }
+                        
+                        println!("✅ Final cropped_vec size: {}", cropped_vec.len());
+                        let cropped_b64 = mat_to_base64(&resized).unwrap_or_default();
+                        let updated_original_b64 = mat_to_base64(&cloned).unwrap_or_default();
+
+                        image_data.set(Some(ImageData {
+                            original_base64: updated_original_b64,
+                            cropped_base64: cropped_b64,
+                            cropped_vec,
+                            x1,
+                            y1,
+                            x2,
+                            y2,
+                            crop_width: width,
+                            crop_height: height,
+                        }));
+                    }
+                }
+            }
+
+            rect_state.set(RectState::default());
+        }
+    };
+
+ // Compute the overlay rectangle once, *outside* of rsx!
+ let (overlay_x, overlay_y, overlay_w, overlay_h) = if rect_state.read().is_drawing {
+     let r = rect_state.read();
+     let x = r.start_x.min(r.current_x);
+     let y = r.start_y.min(r.current_y);
+     let w = (r.current_x - r.start_x).abs();
+     let h = (r.current_y - r.start_y).abs();
+     (x, y, w, h)
+ } else {
+     (0, 0, 0, 0)
+ };
+ let grayscale_matrix: Option<VNode> = if color_mode == "grayscale" {
+    if let Some(img) = image_data.read().as_ref() {
+        if img.cropped_vec.len() == 256 {
+            let mut cells: Vec<VNode> = Vec::new();
+
+            for row in 0..16 {
+                for col in 0..16 {
+                    let idx = row * 16 + col;
+                    let val = img.cropped_vec[idx];
+                    let bg = format!("background-color: rgb({0},{0},{0});", val);
+                    cells.push(rsx! {
+                        div {
+                            class: "w-4 h-4 flex items-center justify-center text-[7px] text-white",
+                            style: "{bg}",
+                            "{val}"
+                        }
+                    }.unwrap());
+                }
+            }
+
+            Some(rsx! {
+                div {
+                    class: "mt-4",
+                    h3 { "🧊 Grayscale Matrix (16×16)" }
+                    div {
+                        style: "display: grid; grid-template-columns: repeat(16, 1fr); gap: 1px;",
+                        // ✅ The critical fix:
+                        {cells.into_iter()}
+                    }
+                }
+            }.unwrap())
+        } else {
+            None
+        }
+    } else {
+        None
+    }
+} else {
+    None
+};
+
+
+
+
     rsx! {
         div {
             class:"flex h-1/2 mx-6 mt-5",
@@ -42,6 +354,7 @@ pub fn Learn() -> Element {
                             }
 
                             button {
+                                onclick: load_image,
                                 class: "ml-2 outline-none border-none bg-transparent font-normal text-[11px] text-[#151515]",
                                 "Upload"
                             }
@@ -113,14 +426,80 @@ pub fn Learn() -> Element {
 
                 hr { class: "border-t-[0.5px] border-[#BEBEBE] my-1 w-full" }
 
-                div {
-                    class:"flex justify-center items-center gap-2 bg-white px-4 py-2 border-[#BEBEBE] rounded-lg",
-                    img {
-                        class:"w-[228px] h-[188px]",
-                        src:"https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?cs=srgb&dl=pexels-souvenirpixels-414612.jpg&fm=jpg",
-                        alt:"Preview Image"
-                    }
+                if let Some(img) = image_data.read().as_ref() {
+    div {
+        // ─────────────── Left column: Original Image ───────────────
+        div {
+            // class:"flex",
+            class: "flex justify-center items-center",
+            // h3 { "Original Image" }
+            // this wrapper both centers the image and acts as position:relative
+            div {
+                class: "flex justify-center items-center",
+                style: format!(
+                    "position: relative; width: {}px; height: {}px;",
+                    RENDERED_IMG_SIZE, RENDERED_IMG_SIZE
+                ),
+                // the image itself
+                img {
+                    src: "data:image/jpeg;base64,{img.original_base64}",
+                    style: "width: {RENDERED_IMG_SIZE}px; height: {RENDERED_IMG_SIZE}px; user-select: none; cursor: crosshair;",
+                    onmousedown: onmousedown,
+                    onmousemove: onmousemove,
+                    onmouseup: onmouseup,
+                    draggable: false
                 }
+                // red-dashed preview while dragging
+                                     // Now use the precomputed overlay_x, _y, _w, _h
+                     if rect_state.read().is_drawing {
+                         div {
+                             style: format!(
+                                 "position: absolute; left: {}px; top: {}px; width: {}px; height: {}px;\
+                                 border: 2px dashed red; pointer-events: none;",
+                                 overlay_x, overlay_y, overlay_w, overlay_h
+                             )
+                         }
+                     }
+                     
+            }
+            
+        }
+        // div { 
+        //     {grayscale_matrix}
+        //  }
+
+        // ───────────── Right column: Cropped Image ─────────────
+        // div {
+        //     h3 { "📐 Cropped Image" }
+        //     if !img.cropped_base64.is_empty() {
+        //         img {
+        //             style: "max-width: 300px; border: 1px solid black;",
+        //             src: "data:image/jpeg;base64,{img.cropped_base64}"
+        //         }
+        //         ul {
+        //             li { "x1: {img.x1}" }
+        //             li { "y1: {img.y1}" }
+        //             li { "x2: {img.x2}" }
+        //             li { "y2: {img.y2}" }
+        //             li { "Width: {img.crop_width}" }
+        //             li { "Height: {img.crop_height}" }
+        //         }
+        //         p { "Raw bytes: {img.cropped_vec.len()} bytes" }
+        //     } else {
+        //         p { "⬅️ Draw a rectangle on the image to crop." }
+        //     }
+        // }
+    }
+}
+
+                // div {
+                //     class:"flex justify-center items-center gap-2 bg-white px-4 py-2 border-[#BEBEBE] rounded-lg",
+                //     img {
+                //         class:"w-[228px] h-[188px]",
+                //         src:"https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?cs=srgb&dl=pexels-souvenirpixels-414612.jpg&fm=jpg",
+                //         alt:"Preview Image"
+                //     }
+                // }
 
                 div {
                     class: "flex justify-center items-center gap-2 bg-white px-4 py-2 border-[#BEBEBE] rounded-lg",
@@ -412,4 +791,9 @@ pub fn Learn() -> Element {
             }
          }
     }
+}
+fn mat_to_base64(mat: &Mat) -> opencv::Result<String> {
+    let mut buf = Vector::new();
+    imencode(".jpg", mat, &mut buf, &Vector::new())?;
+    Ok(STANDARD.encode(&buf.to_vec()))
 }
