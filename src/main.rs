@@ -12,9 +12,6 @@ mod views;
 
 use components::tabs::Tabs;
 use state::tabs::TabContext;
-use components::chrome_style_navbar::ChromeStyleNavbar;
-use components::collapsible_image::CollapsibleImage;
-use components::project_details::ProjectDetails;
 use components::top_bar::TopBar;
 use views::home_page::HomePage;
 use views::project_details::ProjectDetails;

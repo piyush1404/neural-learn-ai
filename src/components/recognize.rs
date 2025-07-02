@@ -114,11 +114,11 @@ pub fn Recognize() -> Element {
 
                 div {
                     class:"flex justify-center items-center gap-2 bg-white px-4 py-2 border-[#BEBEBE] rounded-lg",
-                    img {
-                        class:"w-[228px] h-[188px]",
-                        src:"https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?cs=srgb&dl=pexels-souvenirpixels-414612.jpg&fm=jpg",
-                        alt:"Preview Image"
-                    }
+                    // img {
+                    //     class:"w-[228px] h-[188px]",
+                    //     src:"https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?cs=srgb&dl=pexels-souvenirpixels-414612.jpg&fm=jpg",
+                    //     alt:"Preview Image"
+                    // }
                 }
 
                 div {

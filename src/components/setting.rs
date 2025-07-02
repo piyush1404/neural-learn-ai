@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use crate::components::project_details::{AppState, SharedData};
+use crate::views::project_details::{AppState, SharedData};
 
 
 #[component]

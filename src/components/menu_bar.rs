@@ -1,7 +1,7 @@
 use dioxus::{html::tr, prelude::*};
 
 use crate::components::{knowledge_modal::KnowledgeModal, option_annotations::OptionForAnnotation};
-use crate::components::project_details::{AppState, SharedData};
+use crate::views::project_details::{AppState, SharedData};
 
 #[component]
 pub fn MenuBar(app_state: AppState) -> Element {

@@ -7,7 +7,7 @@ use opencv::{
 };
 use rfd::FileDialog;
 use base64::{engine::general_purpose::STANDARD, Engine};
-use crate::components::project_details::AppState;
+use crate::views::project_details::AppState;
 const RENDERED_IMG_SIZE: i32 = 228;
 
 #[derive(Clone)]

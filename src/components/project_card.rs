@@ -94,8 +94,8 @@ pub fn ProjectCard(
         }
     });
 
-    created_at = format_date_mmddyyyy(created_at.as_str());
-    updated_at = format_date_mmddyyyy(updated_at.as_str());
+    let created_at = format_date_mmddyyyy(created_at.as_str());
+    let updated_at = format_date_mmddyyyy(updated_at.as_str());
 
     let mut hovered = use_signal(|| false);
 

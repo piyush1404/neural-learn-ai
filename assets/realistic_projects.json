@@ -1,11 +1,59 @@
 [
   {
+    "id": "75b2256a-39e4-4e5e-988c-f521065601ed",
+    "name": "test project",
+    "platform": "Brilliant",
+    "interface": "Image",
+    "type": "vision",
+    "description": "test",
+    "created_at": "2025-07-02T10:51:58.818335385+00:00",
+    "updated_at": "2025-07-02T10:52:40.145677037+00:00",
+    "files": null,
+    "neurons": null,
+    "categories": [
+      {
+        "id": 0,
+        "name": "Background",
+        "color": "#4C4C4C",
+        "context_id": 0
+      },
+      {
+        "id": 1,
+        "name": "black",
+        "color": "#000000",
+        "context_id": 101
+      },
+      {
+        "id": 2,
+        "name": "green",
+        "color": "#000000",
+        "context_id": 101
+      }
+    ],
+    "feature_extraction": {
+      "algorithm": "Subsample",
+      "normalized": false,
+      "roi_width": 64,
+      "roi_height": 64,
+      "block_width": 1,
+      "block_height": 1,
+      "if_field_range": {
+        "min": 0,
+        "max": 255
+      }
+    },
+    "learn_properties": null,
+    "recognize_properties": null,
+    "annotations": null,
+    "knowledge": null
+  },
+  {
     "id": "6efcd93f-201d-43b1-b8ea-e2c4099b2032",
     "name": "",
     "platform": "Simulation",
     "interface": "Image",
     "type": "vision",
-    "description": "",
+    "description": "test vision",
     "created_at": "2025-07-01T10:20:32.837380900+00:00",
     "updated_at": "2025-07-01T10:20:32.837380900+00:00",
     "files": null,
