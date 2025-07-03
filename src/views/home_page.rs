@@ -1,21 +1,52 @@
 use dioxus::prelude::*;
-use std::fs;
-
 use crate::components::new_project_card::NewProjectCard;
 use crate::components::project_card::ProjectCard;
-
-use crate::store::project::{
-    add_project, delete_project, get_projects_by_name, load_projects, update_project, 
-};
+use crate::store::project::{ delete_project, load_projects};
 use crate::store::project_schema::Project;
 
 const PAGE_SIZE: usize = 7;
 
 #[component]
 pub fn HomePage() -> Element {
-    let projects = use_signal(|| load_projects());
 
-    println!("Projects: {:#?}", projects());
+    let mut search_query = use_signal(|| "".to_string());
+    let mut platform_filter = use_signal(|| "".to_string());
+    let mut status_filter = use_signal(|| "all".to_string());
+    
+    // use_memo watches for signal reads inside the closure
+    // let mut projects = use_memo(move || {
+    //     // Read the signal values inside the closure
+    //     let _query = search_query();      // this makes it reactive
+    //     let _platform_filter = platform_filter();  // this too
+    //     let _status_filter = status_filter();
+
+    //     load_projects()
+    // });
+
+    let mut is_updating = use_signal(|| false);
+
+    // Example: toggling this causes re-rendering
+    let mut projects = use_signal(|| load_projects());
+
+    // let update_projects = move || {
+    //    is_updating.set(true); // Trigger a change
+    //    projects.set(load_projects()); // reload the data
+    //    is_updating.set(false); // Reset
+    // };
+
+    use_effect(move || {
+        if *is_updating.read() {
+            // Do something when update is triggered
+            projects.set(load_projects());
+            is_updating.set(false);
+        }
+    
+        // Optional cleanup or effect teardown
+        // || {}
+    });
+    
+
+    println!("Projects: {:#?}", projects().len());
 
     let mut current_page = use_signal(|| 0);
 
@@ -40,20 +71,35 @@ pub fn HomePage() -> Element {
         }
     };
 
-    // Calculate visible projects for current page
-    let visible_projects = {
-        let start = current_page() * PAGE_SIZE;
-        let end = (start + PAGE_SIZE).min(projects().len());
-        projects()[start..end].to_vec()
-    };
+    let filtered_projects: Vec<Project> = projects()
+    .iter()
+    .filter(|project| {
+        // Match search query
+        project.name.to_lowercase().contains(&search_query().to_lowercase())
+    })
+    .filter(|project| {
+        // Match platform
+        project.platform.to_lowercase().contains(&platform_filter().to_lowercase())
+    })
+    // .filter(|project| {
+    //     match status_filter().as_str() {
+    //         "complete" => project.is_completed == Some(true),
+    //         "incomplete" => project.is_completed != Some(true),
+    //         _ => true, // "all"
+    //     }
+    // })
+    .cloned()
+    .collect();
 
-    // test_add_project();
-    // test_get_projects_by_name();
-    // test_update_project();
+    let total_pages = (filtered_projects.len() + PAGE_SIZE - 1) / PAGE_SIZE;
+    let start = current_page() * PAGE_SIZE;
+    let end = (start + PAGE_SIZE).min(filtered_projects.len());
+
+    let visible_projects = filtered_projects[start..end].to_vec();
+
     // test_delete_project();
-
     let page_info = format!("{:02}/{:02}", current_page() + 1, total_pages);
-
+    
     rsx! {
         div {
             class: "flex flex-col w-full border border-[#BEBEBE] rounded-lg mt-1",
@@ -67,13 +113,19 @@ pub fn HomePage() -> Element {
                         class: "flex items-center gap-4",
                         label {
                             class: "flex items-center gap-2 cursor-pointer",
-                            input { r#type: "radio", name: "filter", value: "all", checked: true,
-                            class: "w-5 h-5 border-2 rounded-full accent-[#0387D9]" }
+                            input { 
+                                r#type: "radio", name: "filter", value: "all", checked: true,
+                                onchange: move |evt| status_filter.set(evt.value()),
+                                class: "w-5 h-5 border-2 rounded-full accent-[#0387D9]" 
+                        }
                             span { class: "text-[#151515] text-xs font-light", "All" }
                         }
                         label {
                             class: "flex items-center gap-2 cursor-pointer",
-                            input { r#type: "radio", name: "filter", value: "complete",  class: "w-5 h-5 border-2 rounded-full accent-[#0387D9]"}
+                            input { r#type: "radio", name: "filter", value: "complete", 
+                                onchange: move |evt| status_filter.set(evt.value()), 
+                                class: "w-5 h-5 border-2 rounded-full accent-[#0387D9]
+                            "}
                             svg {
                                 width: "18",
                                 height: "18",
@@ -90,7 +142,11 @@ pub fn HomePage() -> Element {
                         }
                         label {
                             class: "flex items-center gap-2 cursor-pointer",
-                            input { r#type: "radio", name: "filter", value: "incomplete", class: "w-5 h-5 border-2 rounded-full accent-[#0387D9]" }
+                            input { 
+                                r#type: "radio", name: "filter", value: "incomplete", 
+                                onchange: move |evt| status_filter.set(evt.value()),
+                                class: "w-5 h-5 border-2 rounded-full accent-[#0387D9]" 
+                            }
                             svg {
                                 width: "18",
                                 height: "18",
@@ -115,10 +171,11 @@ pub fn HomePage() -> Element {
                         background-position: right 0.75rem center;
                         background-size: 10px 6px;
                     "#,
-                        option { value: "", disabled: true, selected: true, "Select Platform :" }
-                        option { value: "web", "Web" }
-                        option { value: "mobile", "Mobile" }
-                        option { value: "desktop", "Desktop" }
+                    onchange: move |evt| platform_filter.set(evt.value()),
+                    option { value: "", disabled: true, hidden: true, selected: platform_filter() == "", "Select Platform :" }
+                    option { value: "Simulation", "Simulation" }
+                    option { value: "Brilliant", "Brilliant" }
+                    option { value: "Neuro Shield", "Neuro Shield" }
                     }
 
                     div {
@@ -136,6 +193,7 @@ pub fn HomePage() -> Element {
                         }
                         input {
                             r#type: "text",
+                            oninput: move |evt| search_query.set(evt.value()),
                             placeholder: "Search",
                             class: "ml-2 outline-none border-none bg-transparent font-normal text-xs text-[#555555]"
                         }
@@ -144,7 +202,7 @@ pub fn HomePage() -> Element {
             }
             div {
                 class: "h-full grid grid-cols-4 gap-4 p-4",
-                NewProjectCard {},
+                NewProjectCard { is_updating: is_updating },
                {
                 visible_projects.into_iter().map(|project| {
                     rsx! {
@@ -156,7 +214,8 @@ pub fn HomePage() -> Element {
                             description: project.description,
                             created_at: project.created_at.unwrap_or("Unknown".to_string()),
                             updated_at: project.updated_at.unwrap_or("Unknown".to_string()),
-                            neurons: project.neurons.clone().map(|n| n)
+                            neurons: project.neurons.clone().map(|n| n),
+                            is_updating: is_updating
                         }
                     }
                 })
@@ -297,31 +356,6 @@ pub fn HomePage() -> Element {
                  }
             }
         }
-    }
-}
-
-pub fn test_add_project() {
-    let json = fs::read_to_string("assets/sample_project.json").expect("Failed to read file");
-    let project: Project = serde_json::from_str(&json).expect("Invalid JSON");
-    match add_project(project) {
-        Ok(_) => println!("Project added successfully."),
-        Err(e) => eprintln!("Error adding project: {}", e),
-    }
-}
-
-pub fn test_get_projects_by_name() {
-    let matches = get_projects_by_name(" ai");
-    for p in matches {
-        println!("Matched: {}", p.name);
-    }
-}
-
-pub fn test_update_project() {
-    let json = fs::read_to_string("assets/sample_project.json").expect("Failed to read file");
-    let project: Project = serde_json::from_str(&json).expect("Invalid JSON");
-    match update_project("SmartMartAI", project) {
-        Ok(_) => println!("Project updated successfully."),
-        Err(e) => eprintln!("Error updating project: {}", e),
     }
 }
 

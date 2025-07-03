@@ -15,6 +15,7 @@ pub fn ProjectCard(
     created_at: String,
     updated_at: String,
     neurons: Option<NeuronConfig>,
+    is_updating:Option<Signal<bool>>
 ) -> Element {
 
     let project = get_project_by_id(&id).unwrap();
@@ -325,6 +326,7 @@ pub fn ProjectCard(
                         ProjectForm {
                             show_modal: show_edit_modal,
                             project: project.clone(),
+                            is_updating : is_updating,
                         }
                     }
 

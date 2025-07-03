@@ -1,8 +1,16 @@
 use dioxus::prelude::*;
 use crate::components::project_form::ProjectForm;
 
+#[derive(PartialEq, Props, Clone)]
+pub struct NewProjectCardProps {
+    is_updating: Signal<bool>,
+}
+
+
 #[component]
-pub fn NewProjectCard() -> Element {
+pub fn NewProjectCard(props: NewProjectCardProps) -> Element {
+    // Access the passed signal
+    let is_updating = props.is_updating;
     let mut show_modal = use_signal(|| false);
     let mut show_advanced = use_signal(|| false);
 
@@ -35,6 +43,7 @@ pub fn NewProjectCard() -> Element {
         if *show_modal.read() {
             ProjectForm {
                 show_modal: show_modal,
+                is_updating: is_updating
             }
         }
     }

@@ -9,6 +9,7 @@ use crate::date_format::{get_local_and_utc_iso};
 pub struct ProjectFormProps {
     show_modal: Signal<bool>,
     project: Option<Project>,
+    is_updating: Option<Signal<bool>>
 }
 use crate::state::tabs::TabContext;
 
@@ -18,6 +19,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
     let (_, utc_iso) = get_local_and_utc_iso();
 
     let mut show_modal = props.show_modal;
+    let mut is_updating = props.is_updating;
     let mut show_advanced = use_signal(|| false);
 
     let mut categories = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().categories.clone() } else { vec![
@@ -850,10 +852,13 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
 
                                     }
                                     show_modal.set(false);
-                                    println!("id: {}", id);
-                                    println!("props.project is: {:?}", props.project);
-                                    println!("name: {}", project_name.read());
-                                    open_image_roi("1", project_name.read().clone());
+                                    if let Some(mut is_updating_signal) = is_updating {
+                                        is_updating_signal.set(true);
+                                    }
+                                    // println!("id: {}", id);
+                                    // println!("props.project is: {:?}", props.project);
+                                    // println!("name: {}", project_name.read());
+                                    // open_image_roi("1", project_name.read().clone());
 
                                 },
                                 class: "font-medium text-xs bg-[#101010] text-[#FFFFFF] rounded-[3px] px-4 py-1",
