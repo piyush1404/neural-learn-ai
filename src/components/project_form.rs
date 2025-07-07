@@ -5,6 +5,9 @@ use uuid::Uuid;
 use crate::store::project_schema::{ Project, Category};
 use crate::store::project::{ self, add_project, update_project };
 use crate::date_format::{get_local_and_utc_iso};
+use crate::views::project_details::{AppState, SharedData};
+use crate::store::project::ProjectState;
+
 #[derive(PartialEq, Props, Clone)]
 pub struct ProjectFormProps {
     show_modal: Signal<bool>,
@@ -14,7 +17,9 @@ use crate::state::tabs::TabContext;
 
 #[component]
 pub fn ProjectForm(props: ProjectFormProps) -> Element {
-    let mut tab_context = use_context::<Signal<TabContext>>();
+    let mut tab_context: Signal<TabContext> = use_context::<Signal<TabContext>>();
+    let mut project_state = use_context::<ProjectState>();
+    println!("ProjectForm entered");
     let (_, utc_iso) = get_local_and_utc_iso();
 
     let mut show_modal = props.show_modal;
@@ -33,12 +38,12 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
     let mut description = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().description.clone() } else { "".to_string() });
     let mut description_error=use_signal(|| false);
     let mut normalized = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().normalized } else { false });
-    let mut algorithm = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().algorithm.clone() } else { "Subsample".to_string() });
+    let mut algorithm = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().algorithm.clone() } else { "grayscale".to_string() });
 
     let mut roi_width = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().roi_width } else { 64 });
     let mut roi_height = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().roi_height } else { 64 });
-    let mut block_width = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().block_width } else { 16 });
-    let mut block_height = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().block_height } else { 16 });
+    let mut block_width = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().block_width } else { 1 });
+    let mut block_height = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().block_height } else { 1 });
     let mut range_min = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().if_field_range.min } else { 0 });
     let mut range_max = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().if_field_range.max } else { 255 });
 
@@ -208,9 +213,10 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
         move |id: &str, name: String| {
             println!("Opening image ROI...");
             println!("ID: {}, Project Name: {}", id, name);
+            project_state.project_id.set(id.to_string());
+            project_state.project_name.set(name.to_string());
             tab_context.write().add_tab(
-                "Sensor Chip",
-                // rsx! { crate::views::image_roi::ImageRoi {} },
+                &name,
                 rsx! { crate::views::project_details::ProjectDetails {} },
                 Some(rsx! {
                         svg {
@@ -362,7 +368,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                     }
                 }
                 div {
-                    class: "col-span-3 mt-[10pxs]",
+                    class: "col-span-3 mt-4",
                     div {
                         class: "flex justify-between items-center bg-[#EFEFEF] mb-1 text-xs text-[#404040]",
                         span { "Description" }
@@ -565,8 +571,8 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                             background-size: 10px 6px;
                                         "#,
                                         onchange: move |e| algorithm.set(e.value()),
-                                        option { "Subsample" }
-                                        option {  "Subsample RGB" }
+                                        option { value: "grayscale", "Subsample" }
+                                        option { value: "rgb", "Subsample RGB" }
                                         option { "Histogram" }
                                         option {  "Histogram Cumulative" }
                                         option {  "Histogram RGB" }
@@ -718,8 +724,9 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                             }
                             button {
                                 onclick: move |_| {
-                                    let id = Uuid::new_v4().to_string();
                                     if props.project.is_none(){
+                                        let id = Uuid::new_v4().to_string();
+                                        println!("Creating in IFnew project with ID: {}", id);
                                         let project_form_data = serde_json::json!({
                                             "id": id,
                                             "name": project_name.read().to_string(),
@@ -762,9 +769,12 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                             Err(e) => {
                                                 eprintln!("Failed to deserialize project_form_data: {}", e);
                                             }
-                                        }    
+                                        }   
+                                    open_image_roi(&id, project_name.read().clone());
+
                                     }else {
                                         let id = props.project.as_ref().unwrap().id.clone();
+                                        println!("Creating in ELSE new project with ID: {}", id);
 
                                         use serde_json::{json, Map, Value};
                                         let mut patch_payload = Map::new();
@@ -847,13 +857,13 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                                 eprintln!("Failed to deserialize project_form_data: {}", e);
                                             }
                                         }
+                                        open_image_roi(&id, project_name.read().clone());
 
                                     }
                                     show_modal.set(false);
-                                    println!("id: {}", id);
-                                    println!("props.project is: {:?}", props.project);
-                                    println!("name: {}", project_name.read());
-                                    open_image_roi("1", project_name.read().clone());
+                                    // println!("----------------------------------->id: {}", id);
+                                    // println!("props.project is: {:?}", props.project);
+                                    // println!("name: {}", project_name.read());
 
                                 },
                                 class: "font-medium text-xs bg-[#101010] text-[#FFFFFF] rounded-[3px] px-4 py-1",

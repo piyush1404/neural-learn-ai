@@ -10,12 +10,9 @@ use crate::store::project::{
 use crate::store::project_schema::Project;
 
 const PAGE_SIZE: usize = 7;
-
 #[component]
 pub fn HomePage() -> Element {
     let projects = use_signal(|| load_projects());
-
-    println!("Projects: {:#?}", projects());
 
     let mut current_page = use_signal(|| 0);
 

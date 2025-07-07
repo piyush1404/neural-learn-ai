@@ -9,3 +9,4 @@ pub mod tabs;
 pub mod project_form;
 pub mod knowledge_modal;
 pub mod option_annotations;
+pub mod dropdown;

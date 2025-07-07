@@ -1,3 +1,4 @@
+
 use dioxus::prelude::*;
 use opencv::{
     core::{Mat, Rect, Scalar, Vector},
@@ -35,8 +36,6 @@ struct RectState {
 #[component]
 pub fn Learn(app_state: AppState) -> Element {
     let mut shared = app_state.shared;
-    println!("state: {:?}", shared().algorithm);
-    println!("state: {:?}", shared().clear_clicked);
     // let clear_clicked = shared().clear_clicked;
     let mut image_data = use_signal(|| None as Option<ImageData>);
     use_effect(move || {
@@ -147,7 +146,7 @@ pub fn Learn(app_state: AppState) -> Element {
                     &mut cloned,
                     rect,
                     Scalar::new(0.0, 255.0, 0.0, 0.0),
-                    2,
+                    6,
                     imgproc::LINE_8,
                     0,
                 );
