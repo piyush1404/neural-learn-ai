@@ -99,7 +99,7 @@ pub fn HomePage() -> Element {
 
     // test_delete_project();
     let page_info = format!("{:02}/{:02}", current_page() + 1, total_pages);
-    
+
     rsx! {
         div {
             class: "flex flex-col w-full border border-[#BEBEBE] rounded-lg mt-1",

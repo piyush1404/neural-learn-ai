@@ -1,186 +1,13 @@
 [
   {
-    "id": "4103c152-8e79-4ddd-96df-50d50cb24894",
-    "name": "Retail Vision AI",
-    "platform": "Brilliant",
-    "interface": "HDMI",
-    "type": "vision",
-    "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-    "created_at": "2024-01-10T09:15:00Z",
-    "updated_at": "2024-01-15T12:30:00Z",
-    "files": [
-      {
-        "id": 101,
-        "path": "images/retail_shelf_1.jpg",
-        "type": "image"
-      }
-    ],
-    "neurons": {
-      "min_if": 5,
-      "max_if": 45000,
-      "search_area": [
-        0,
-        0,
-        128,
-        128
-      ],
-      "total_neurons": 4096,
-      "committed_neurons": 16
-    },
-    "categories": [
-      {
-        "id": 1,
-        "name": "empty_space",
-        "color": "#FF9900",
-        "context_id": 1
-      },
-      {
-        "id": 2,
-        "name": "product",
-        "color": "#33CC33",
-        "context_id": 2
-      }
-    ],
-    "feature_extraction": {
-      "algorithm": "HOG",
-      "normalized": true,
-      "roi_width": 64,
-      "roi_height": 64,
-      "block_width": 2,
-      "block_height": 2,
-      "if_field_range": {
-        "min": 5,
-        "max": 45000
-      }
-    },
-    "learn_properties": {
-      "step_xy": {
-        "x": 2,
-        "y": 2,
-        "metric": "px"
-      },
-      "auto_learn": true
-    },
-    "recognize_properties": {
-      "output_mode": "Object",
-      "step_xy": {
-        "x": 2,
-        "y": 2,
-        "metric": "px"
-      },
-      "skip_xy": {
-        "x": 2,
-        "y": 2
-      },
-      "auto_recognize": true,
-      "full_image": true,
-      "show_mode": "Heatmap"
-    },
-    "annotations": {
-      "options": {
-        "auto_surrounding_examples": "Top3",
-        "positions": {
-          "directions": [
-            "N",
-            "E",
-            "S",
-            "W"
-          ],
-          "distance_to_center": 8
-        }
-      },
-      "annotations": [
-        {
-          "id": 1,
-          "category_id": 1,
-          "file_id": 101,
-          "x": 12,
-          "y": 20,
-          "width": 30,
-          "height": 30,
-          "label": "Empty"
-        },
-        {
-          "id": 2,
-          "category_id": 2,
-          "file_id": 101,
-          "x": 60,
-          "y": 45,
-          "width": 25,
-          "height": 25,
-          "label": "Product"
-        }
-      ]
-    },
-    "knowledge": {
-      "categories": [
-        {
-          "id": 1,
-          "base64": "ZW1wdHlfc3BhY2U="
-        },
-        {
-          "id": 2,
-          "base64": "cHJvZHVjdA=="
-        }
-      ],
-      "neurons": [
-        {
-          "neuron_id": 11,
-          "category": 2,
-          "ncr": 25431,
-          "model": "RetailNet-v1",
-          "active_if": 18,
-          "min_if": 5,
-          "degenerate": false
-        }
-      ]
-    }
-  },
-  {
-    "id": "69dcceec-cde2-4cc9-a9a6-b2caa0ac2bcb",
-    "name": "Medical X-Ray Analyzer123",
-    "platform": "Brilliant",
-    "interface": "Video",
-    "type": "vision",
-    "description": "MedicalXRayAnalyzer is an advanced computer vision application.",
-    "created_at": "2025-07-03T05:58:42.610774900+00:00",
-    "updated_at": "2025-07-03T06:20:59.042463100+00:00",
-    "files": null,
-    "neurons": null,
-    "categories": [
-      {
-        "id": 0,
-        "name": "Background",
-        "color": "#4C4C4C",
-        "context_id": 0
-      }
-    ],
-    "feature_extraction": {
-      "algorithm": "Subsample",
-      "normalized": false,
-      "roi_width": 64,
-      "roi_height": 64,
-      "block_width": 16,
-      "block_height": 16,
-      "if_field_range": {
-        "min": 0,
-        "max": 255
-      }
-    },
-    "learn_properties": null,
-    "recognize_properties": null,
-    "annotations": null,
-    "knowledge": null
-  },
-  {
-    "id": "dcdbe9fd-eb42-4f99-9784-5bf76bb25ca4",
-    "name": "Wild life Tracker AI124",
+    "id": "81b7c1c3-445d-4158-8177-51793ddd46f5",
+    "name": "dfgdffg",
     "platform": "Simulation",
     "interface": "Image",
     "type": "vision",
-    "description": "WildlifeTrackerAI is an advanced computer vision application",
-    "created_at": "2025-07-02T12:20:50.028427100+00:00",
-    "updated_at": "2025-07-03T05:25:09.709195300+00:00",
+    "description": "",
+    "created_at": "2025-07-04T03:37:02.561699500+00:00",
+    "updated_at": "2025-07-04T03:37:02.561699500+00:00",
     "files": null,
     "neurons": null,
     "categories": [
@@ -194,13 +21,13 @@
     "feature_extraction": {
       "algorithm": "Subsample",
       "normalized": false,
-      "roi_width": 64,
-      "roi_height": 64,
-      "block_width": 16,
-      "block_height": 16,
+      "roi_width": 16,
+      "roi_height": 16,
+      "block_width": 1,
+      "block_height": 1,
       "if_field_range": {
-        "min": 0,
-        "max": 255
+        "min": 1,
+        "max": 65535
       }
     },
     "learn_properties": null,
@@ -209,14 +36,14 @@
     "knowledge": null
   },
   {
-    "id": "3d0517d5-3f6c-44e9-b968-db0ababd8294",
-    "name": "Drone Surveillance Vision",
-    "platform": "Brilliant",
-    "interface": "Image",
+    "id": "b753a17b-d071-4ad9-b7d6-ac7db49753df",
+    "name": "Medical X-Ray Analyzer",
+    "platform": "Simulation",
+    "interface": "Video",
     "type": "vision",
-    "description": "WildlifeTrackerAI is an advanced computer vision application",
-    "created_at": "2025-07-02T12:20:26.484511800+00:00",
-    "updated_at": "2025-07-03T05:25:26.291465600+00:00",
+    "description": "Medical X-Ray Analyzer",
+    "created_at": "2025-07-04T03:22:31.848564+00:00",
+    "updated_at": "2025-07-04T03:22:55.071936900+00:00",
     "files": null,
     "neurons": null,
     "categories": [
@@ -229,14 +56,14 @@
     ],
     "feature_extraction": {
       "algorithm": "Subsample",
-      "normalized": false,
-      "roi_width": 64,
-      "roi_height": 64,
-      "block_width": 16,
-      "block_height": 16,
+      "normalized": true,
+      "roi_width": 16,
+      "roi_height": 16,
+      "block_width": 1,
+      "block_height": 1,
       "if_field_range": {
-        "min": 0,
-        "max": 255
+        "min": 1,
+        "max": 65535
       }
     },
     "learn_properties": null,

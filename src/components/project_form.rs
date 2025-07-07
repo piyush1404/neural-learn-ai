@@ -1,9 +1,8 @@
 use chrono::Utc;
-use dioxus::html::a::r#type;
 use dioxus::prelude::*;
 use uuid::Uuid;
 use crate::store::project_schema::{ Project, Category};
-use crate::store::project::{ self, add_project, update_project };
+use crate::store::project::{ add_project, update_project };
 use crate::date_format::{get_local_and_utc_iso};
 #[derive(PartialEq, Props, Clone)]
 pub struct ProjectFormProps {
@@ -37,12 +36,12 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
     let mut normalized = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().normalized } else { false });
     let mut algorithm = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().algorithm.clone() } else { "Subsample".to_string() });
 
-    let mut roi_width = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().roi_width } else { 64 });
-    let mut roi_height = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().roi_height } else { 64 });
-    let mut block_width = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().block_width } else { 16 });
-    let mut block_height = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().block_height } else { 16 });
-    let mut range_min = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().if_field_range.min } else { 0 });
-    let mut range_max = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().if_field_range.max } else { 255 });
+    let mut roi_width = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().roi_width } else { 16 });
+    let mut roi_height = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().roi_height } else { 16 });
+    let mut block_width = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().block_width } else { 1 });
+    let mut block_height = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().block_height } else { 1 });
+    let mut range_min = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().if_field_range.min } else { 1 });
+    let mut range_max = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().feature_extraction.as_ref().unwrap().if_field_range.max } else { 16 });
 
     let selected_label = use_signal(|| if props.project.is_some() { props.project.as_ref().unwrap().interface.clone() } else { "Image".to_string() });
     let mut selected_icon = use_signal(|| rsx!(svg {
@@ -242,6 +241,10 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
             );
         }
     };
+
+    let mut is_error=use_signal(|| false);
+    let mut error = use_signal(|| "".to_string());
+
     rsx! {
         div {
             class: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50",
@@ -408,9 +411,27 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                             class: "pt-3 border-r w-[22%] flex flex-col justify-between h-[266px]",
                         
                             div {
-                                class: "relative mb-2 overflow-y-auto space-y-2 h-[266px]",
-                        
-                                span { class: "block mb-2 text-xs text-[#404040] font-normal", "Categories" }
+                                class: "relative overflow-y-auto space-y-2 h-[266px] custom-scrollbar",
+
+                                div {  
+                                    class: "flex justify-between items-center pr-2",
+                                    span { class: "text-xs text-[#404040] font-normal", "Categories" }
+                                    button {
+                                        class: "text-[#0387D9] font-medium text-sm ",
+                                        onclick: move |_| {
+                                            categories.set(vec![
+                                                Category {
+                                                    id: 1,
+                                                    name: "Background".to_string(),
+                                                    color: "#4C4C4C".to_string(),
+                                                    context_id: 101,
+                                                },
+                                            ]);
+                                        },
+                                        "Reset"
+                                    }
+
+                                }
                         
                                 div {
                                     class: "flex items-center gap-2 text-xs text-[#404040] mb-1",
@@ -418,7 +439,9 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                     span { class: "w-[28px] text-[10px] h-[15px]", "Color" }
                                 }
                         
-                                for (index, category) in categories.read().iter().cloned().enumerate() {
+                                div {  
+                                    class: "flex flex-col gap-1",
+                                    for (index, category) in categories.read().iter().cloned().enumerate() {
                                     div {
                                         class: "flex items-center gap-2",
                         
@@ -434,8 +457,9 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                         
                                         input {
                                             r#type: "color",
-                                            class: "appearance-none border border-gray-300 w-[28px] h-[20px] p-0 rounded cursor-pointer",
+                                            class: "appearance-none w-[28px] h-[20px] p-0 rounded cursor-pointer",
                                             value: category.color.clone(),
+                                            disabled: category.name.trim().is_empty(), 
                                             onchange: move |e| {
                                                 let mut updated = categories.write().clone();
                                                 updated[index].color = e.value().clone();
@@ -446,18 +470,81 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                         div {
                                             if categories.read().len() > 1 && index != categories.read().len() - 1 {
                                                 button {
-                                                    class: "w-[19px] h-[19px] rounded-sm border border-red-300 text-red-500 text-sm flex items-center justify-center",
+                                                    class: "w-[19px] h-[19px] rounded-sm bordertext-sm flex items-center justify-center",
                                                     onclick: move |_| {
                                                         let mut updated = categories.write().clone();
                                                         updated.remove(index);
                                                         categories.set(updated);
                                                     },
-                                                    "×"
+                                                    svg {
+                                                        width: "19",
+                                                        height: "19",
+                                                        view_box: "0 0 19 19",
+                                                        fill: "none",
+                                                        xmlns: "http://www.w3.org/2000/svg",
+                                                
+                                                        rect {
+                                                            x: "0.5",
+                                                            y: "0.5",
+                                                            width: "18",
+                                                            height: "18",
+                                                            rx: "3.5",
+                                                            fill: "white",
+                                                            stroke: "#E56750",
+                                                        }
+                                                
+                                                        mask {
+                                                            id: "path-2-inside-1_355_3774",
+                                                            fill: "white",
+                                                            path {
+                                                                fill_rule: "evenodd",
+                                                                clip_rule: "evenodd",
+                                                                d: "M5.61046 5.61029C5.34205 5.8787 5.34205 6.31414 5.61046 6.58254L12.4164 13.3885C12.6849 13.657 13.1202 13.6569 13.3886 13.3885C13.657 13.1201 13.6571 12.6847 13.3886 12.4162L6.58281 5.6104C6.3143 5.34189 5.87886 5.34189 5.61046 5.61029Z",
+                                                            }
+                                                        }
+                                                
+                                                        path {
+                                                            fill_rule: "evenodd",
+                                                            clip_rule: "evenodd",
+                                                            d: "M5.61046 5.61029C5.34205 5.8787 5.34205 6.31414 5.61046 6.58254L12.4164 13.3885C12.6849 13.657 13.1202 13.6569 13.3886 13.3885C13.657 13.1201 13.6571 12.6847 13.3886 12.4162L6.58281 5.6104C6.3143 5.34189 5.87886 5.34189 5.61046 5.61029Z",
+                                                            fill: "#E56750",
+                                                        }
+                                                
+                                                        path {
+                                                            d: "M5.61046 5.61029L7.52071 7.52054C8.30731 6.73394 8.30731 5.45888 7.52071 4.67229L5.61046 6.58254L3.70021 8.49279C2.3768 7.16939 2.37679 5.02345 3.70021 3.70004L5.61046 5.61029ZM5.61046 6.58254L7.52071 4.67229L14.3266 11.4782L12.4164 13.3885L10.5061 15.2987L3.70021 8.49279L5.61046 6.58254ZM12.4164 13.3885L14.3266 11.4782C13.5399 10.6915 12.2647 10.6919 11.4784 11.4782L13.3886 13.3885L15.2989 15.2987C13.9757 16.6219 11.8299 16.6225 10.5061 15.2987L12.4164 13.3885ZM13.3886 13.3885L11.4784 11.4782C10.692 12.2646 10.6916 13.5397 11.4784 14.3265L13.3886 12.4162L15.2989 10.506C16.6227 11.8297 16.622 13.9756 15.2989 15.2987L13.3886 13.3885ZM13.3886 12.4162L11.4784 14.3265L4.67256 7.52065L6.58281 5.6104L8.49306 3.70014L15.2989 10.506L13.3886 12.4162ZM6.58281 5.6104L4.67256 7.52065C5.45878 8.30688 6.73384 8.30741 7.52071 7.52054L5.61046 5.61029L3.70021 3.70004C5.02388 2.37636 7.16982 2.37691 8.49306 3.70014L6.58281 5.6104Z",
+                                                            fill: "#E56750",
+                                                            mask: "url(#path-2-inside-1_355_3774)",
+                                                        }
+                                                
+                                                        mask {
+                                                            id: "path-4-inside-2_355_3774",
+                                                            fill: "white",
+                                                            path {
+                                                                fill_rule: "evenodd",
+                                                                clip_rule: "evenodd",
+                                                                d: "M5.61046 13.3878C5.87886 13.6562 6.3143 13.6562 6.58271 13.3878L13.3886 6.58183C13.6571 6.31332 13.657 5.87798 13.3886 5.60958C13.1202 5.34118 12.6849 5.34107 12.4164 5.60958L5.61056 12.4154C5.34206 12.6839 5.34206 13.1194 5.61046 13.3878Z",
+                                                            }
+                                                        }
+                                                
+                                                        path {
+                                                            fill_rule: "evenodd",
+                                                            clip_rule: "evenodd",
+                                                            d: "M5.61046 13.3878C5.87886 13.6562 6.3143 13.6562 6.58271 13.3878L13.3886 6.58183C13.6571 6.31332 13.657 5.87798 13.3886 5.60958C13.1202 5.34118 12.6849 5.34107 12.4164 5.60958L5.61056 12.4154C5.34206 12.6839 5.34206 13.1194 5.61046 13.3878Z",
+                                                            fill: "#E56750",
+                                                        }
+                                                
+                                                        path {
+                                                            d: "M5.61046 13.3878L7.52071 11.4775C6.73411 10.6909 5.45905 10.6909 4.67245 11.4775L6.58271 13.3878L8.49296 15.298C7.16956 16.6214 5.02362 16.6214 3.70021 15.298L5.61046 13.3878ZM6.58271 13.3878L4.67245 11.4775L11.4784 4.67157L13.3886 6.58183L15.2989 8.49208L8.49296 15.298L6.58271 13.3878ZM13.3886 6.58183L11.4784 4.67157C10.6916 5.45833 10.692 6.73349 11.4784 7.51983L13.3886 5.60958L15.2989 3.69933C16.622 5.02247 16.6227 7.16831 15.2989 8.49208L13.3886 6.58183ZM13.3886 5.60958L11.4784 7.51983C12.2647 8.30617 13.5399 8.30659 14.3266 7.51983L12.4164 5.60958L10.5061 3.69933C11.8299 2.37556 13.9757 2.37618 15.2989 3.69933L13.3886 5.60958ZM12.4164 5.60958L14.3266 7.51983L7.52082 14.3257L5.61056 12.4154L3.70031 10.5052L10.5061 3.69933L12.4164 5.60958ZM5.61056 12.4154L7.52082 14.3257C8.30704 13.5394 8.30758 12.2644 7.52071 11.4775L5.61046 13.3878L3.70021 15.298C2.37653 13.9743 2.37707 11.8284 3.70031 10.5052L5.61056 12.4154Z",
+                                                            fill: "#E56750",
+                                                            mask: "url(#path-4-inside-2_355_3774)",
+                                                        }
+                                                    }
+                                                
                                                 }
                                             }
                                             if index == categories.read().len() - 1 {
                                                 button {
-                                                    class: "w-[19px] h-[19px] rounded-sm border border-blue-300 text-blue-500 text-sm flex items-center justify-center",
+                                                    class: "w-[19px] h-[19px] rounded border border-[#0387D9] text-sm flex items-center justify-center",
                                                     onclick: move |_| {
                                                         let mut updated = categories.write().clone();
                                                         let new_id = updated.last().map_or(1, |c| c.id + 1);
@@ -469,36 +556,60 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                                         });
                                                         categories.set(updated);
                                                     },
-                                                    "+"
+                                                    svg {
+                                                        width: "11",
+                                                        height: "11",
+                                                        view_box: "0 0 11 11",
+                                                        fill: "none",
+                                                        xmlns: "http://www.w3.org/2000/svg",
+                                                
+                                                        path {
+                                                            d: "M0 5.49998C0 5.87956 0.307902 6.18746 0.687483 6.18746H10.3125C10.6922 6.18746 11 5.87956 11 5.49998C11 5.1204 10.6922 4.8125 10.3125 4.8125H0.687629C0.307903 4.8125 0 5.1204 0 5.49998Z",
+                                                            fill: "#0387D9",
+                                                            fill_rule: "evenodd",
+                                                            clip_rule: "evenodd"
+                                                        }
+                                                
+                                                        path {
+                                                            d: "M5.50002 11C5.8796 11 6.1875 10.6921 6.1875 10.3125V0.687482C6.1875 0.307757 5.8796 0 5.50002 0C5.12044 0 4.81254 0.307757 4.81254 0.687482V10.3124C4.81254 10.6921 5.12044 11 5.50002 11Z",
+                                                            fill: "#0387D9",
+                                                            fill_rule: "evenodd",
+                                                            clip_rule: "evenodd"
+                                                        }
+                                                    }
+                                                          
                                                 }
                                             }
                                         }
                                     }
                                 }
-                        
-                                div {
-                                    class: "absolute bottom-[20px] right-[10px]",
-                                    button {
-                                        class: "bg-[#0387D9] text-[#FFFFFF] px-4 py-1 rounded-[13px] text-sm",
-                                        onclick: move |_| {
-                                            categories.set(vec![
-                                                Category {
-                                                    id: 1,
-                                                    name: "Background".to_string(),
-                                                    color: "#4C4C4C".to_string(),
-                                                    context_id: 101,
-                                                },
-                                                Category {
-                                                    id: 2,
-                                                    name: "Object".to_string(),
-                                                    color: "#F85858".to_string(),
-                                                    context_id: 101,
-                                                },
-                                            ]);
-                                        },
-                                        "Reset"
-                                    }
+
                                 }
+                                
+                        
+                                // div {
+                                //     class: "absolute bottom-[20px] right-[10px]",
+                                //     button {
+                                //         class: "bg-[#0387D9] text-[#FFFFFF] px-4 py-1 rounded-[13px] text-sm",
+                                //         onclick: move |_| {
+                                //             categories.set(vec![
+                                //                 Category {
+                                //                     id: 1,
+                                //                     name: "Background".to_string(),
+                                //                     color: "#4C4C4C".to_string(),
+                                //                     context_id: 101,
+                                //                 },
+                                //                 Category {
+                                //                     id: 2,
+                                //                     name: "Object".to_string(),
+                                //                     color: "#F85858".to_string(),
+                                //                     context_id: 101,
+                                //                 },
+                                //             ]);
+                                //         },
+                                //         "Reset"
+                                //     }
+                                // }
                             }
                         }
                 
@@ -669,6 +780,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                     input {
                                         r#type: "number",
                                         value: "{range_max}",
+                                        max: "16",
                                         class: "border rounded px-2 py-1 text-xs",
                                         oninput: move |e| {
                                             if let Ok(v) = e.value().parse() {
@@ -686,6 +798,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                     input {
                                         r#type: "number",
                                         value: "{range_min}",
+                                        min: "1",
                                         class: "border rounded px-2 py-1 text-xs",
                                         oninput: move |e| {
                                             if let Ok(v) = e.value().parse() {
@@ -722,6 +835,31 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                 onclick: move |_| {
                                     let id = Uuid::new_v4().to_string();
                                     if props.project.is_none(){
+                                        // Collect validation errors
+                                        if project_name.read().trim().is_empty() {
+                                            error.set("Project name cannot be empty".to_string());
+                                            is_error.set(true);
+                                            return; // ✅ Prevents further execution
+                                        }
+
+                                        if platform.read().trim().is_empty() {
+                                            error.set("Platform cannot be empty".to_string());
+                                            is_error.set(true);
+                                            return;
+                                        }
+
+                                        if selected_label.read().trim().is_empty() {
+                                            error.set("Interface cannot be empty".to_string());
+                                            is_error.set(true);
+                                            return;
+                                        }
+
+                                        if description.read().trim().is_empty() {
+                                            error.set("Description cannot be empty".to_string());
+                                            is_error.set(true);
+                                            return;
+                                        }
+
                                         let project_form_data = serde_json::json!({
                                             "id": id,
                                             "name": project_name.read().to_string(),
@@ -799,6 +937,11 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                             patch_payload.insert("description".to_string(), Value::String(description));
                                         }
 
+                                        let neurons = props.project.as_ref().unwrap().neurons.clone();
+                                        if !neurons.is_none() {
+                                            patch_payload.insert("neurons".to_string(), Value::String(format!("{:?}", neurons.unwrap())));
+                                        }
+
                                         let categories = categories.read().iter().map(|cat| {
                                             json!({
                                                 "id": cat.id,
@@ -858,7 +1001,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                     // println!("id: {}", id);
                                     // println!("props.project is: {:?}", props.project);
                                     // println!("name: {}", project_name.read());
-                                    // open_image_roi("1", project_name.read().clone());
+                                    open_image_roi("1", project_name.read().clone());
 
                                 },
                                 class: "font-medium text-xs bg-[#101010] text-[#FFFFFF] rounded-[3px] px-4 py-1",
@@ -872,6 +1015,63 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                             }
                         }
                     }
+
+                    if *is_error.read() {
+                        // AlertCard {
+                        //     title: "Error".to_string(),
+                        //     icon_svg: rsx! {
+                        //         svg {
+                        //             width: "232",
+                        //             height: "76",
+                        //             view_box: "0 0 232 76",
+                        //             fill: "none",
+                        //             xmlns: "http://www.w3.org/2000/svg",
+                        //             // Paste simplified or full path here
+                        //             path { d:"M89.6747 39.3403C89.6747 41.1911 91.175 42.6914 93.0257 42.6914H115.94C117.791 42.6914 119.291 44.1917 119.291 46.0425V46.1714C119.291 48.0221 117.791 49.5225 115.94 49.5225H64.2308C62.3801 49.5225 60.8798 48.0221 60.8798 46.1714V46.0454C60.8798 44.1947 59.3794 42.6943 57.5287 42.6943H34.6136C32.7629 42.6943 31.2626 41.194 31.2626 39.3433V34.9448C31.2626 33.0941 32.7629 31.5938 34.6136 31.5938H86.3236C88.1744 31.5938 89.6747 33.0941 89.6747 34.9448V39.3403ZM183.462 35.9273C183.462 37.778 181.961 39.2783 180.111 39.2783H128.401C126.55 39.2783 125.05 37.778 125.05 35.9273V35.7983C125.05 33.9476 126.55 32.4473 128.401 32.4473H180.111C181.961 32.4473 183.462 33.9476 183.462 35.7983V35.9273ZM183.462 17.9946C183.462 19.8454 184.962 21.3457 186.813 21.3457H194.919C196.77 21.3457 198.27 22.846 198.27 24.6968V29.0952C198.27 30.946 196.77 32.4463 194.919 32.4463H143.209C141.359 32.4463 139.858 30.946 139.858 29.0952V24.6968C139.858 22.846 138.358 21.3457 136.507 21.3457H128.401C126.55 21.3457 125.05 22.846 125.05 24.6968V28.2417C125.05 30.0925 123.549 31.5928 121.699 31.5928H69.9896C68.1389 31.5928 66.6385 30.0925 66.6385 28.2417V23.8433C66.6385 21.9925 68.1389 20.4922 69.9896 20.4922H121.699C123.549 20.4922 125.05 18.9919 125.05 17.1411V13.5952C125.05 11.7445 126.55 10.2441 128.401 10.2441H180.111C181.961 10.2441 183.462 11.7445 183.462 13.5952V17.9946Z" , fill:"#FFF2D2"}
+                        //             path { d:"M73.2197 65.8179C73.2197 67.6686 71.7194 69.1689 69.8687 69.1689H61.7622C59.9115 69.1689 58.4111 70.6693 58.4111 72.52V72.648C58.4111 74.4987 56.9108 75.999 55.0601 75.999H3.35106C1.50032 75.999 0 74.4987 0 72.648V72.519C0 70.6683 1.50032 69.168 3.35106 69.168H11.4575C13.3083 69.168 14.8086 67.6676 14.8086 65.8169V61.4194C14.8086 59.5687 16.3089 58.0684 18.1597 58.0684H69.8687C71.7194 58.0684 73.2197 59.5687 73.2197 61.4194V65.8179ZM58.4111 54.7163C58.4111 56.5671 56.9108 58.0674 55.0601 58.0674H3.35106C1.50032 58.0674 0 56.5671 0 54.7163V50.3179C0 48.4671 1.50032 46.9668 3.35106 46.9668H55.0601C56.9108 46.9668 58.4111 48.4671 58.4111 50.3179V54.7163Z" , fill:"#FFF2D2"}
+                        //             path { d:"M184.833 63.1904C184.833 64.1337 185.597 64.8984 186.541 64.8984H220.816C221.995 64.8984 222.951 65.8542 222.951 67.0332C222.951 68.2122 221.995 69.168 220.816 69.168H183.578C183.514 69.168 183.462 69.1159 183.462 69.0518C183.462 68.9876 183.41 68.9355 183.345 68.9355H163.503C161.652 68.9355 160.152 70.4359 160.152 72.2866V72.4146C160.152 74.2653 158.652 75.7656 156.801 75.7656H124.287C122.436 75.7656 120.936 74.2653 120.936 72.4146V71.6636C120.936 69.8128 122.436 68.3125 124.287 68.3125H142.266C144.116 68.3125 145.617 66.8122 145.617 64.9614V64.8335C145.617 62.9827 147.117 61.4824 148.968 61.4824H183.125C184.068 61.4824 184.833 62.2471 184.833 63.1904Z" , fill:"#FFF2D2"}
+                        //             path { d:"M161.149 50.3809C162.416 50.3809 163.442 51.4075 163.442 52.6738C163.442 53.9402 162.416 54.9668 161.149 54.9668H141.289C139.439 54.9668 137.938 56.4671 137.938 58.3179V58.7544C137.938 60.6051 136.438 62.1055 134.587 62.1055H102.075C100.224 62.1055 98.7235 60.6051 98.7235 58.7544V58.0034C98.7235 56.1527 100.224 54.6523 102.075 54.6523H122.092C123.271 54.6523 124.227 53.6961 124.227 52.5166C124.227 51.3371 125.184 50.3809 126.363 50.3809H161.149Z" , fill:"#FFF2D2"}
+                        //             path { d:"M102.896 4.26758C104.075 4.26758 105.031 5.22335 105.031 6.40234C105.031 7.58134 105.986 8.53711 107.165 8.53711H117.311C119.162 8.53711 120.662 10.0374 120.662 11.8882V12.6392C120.662 14.4899 119.162 15.9902 117.311 15.9902H84.7986C82.9479 15.9902 81.4475 14.4899 81.4475 12.6392V12.2056C81.4475 10.3548 79.9472 8.85449 78.0965 8.85449H68.1092C66.8425 8.85449 65.8157 7.82768 65.8157 6.56104C65.8157 5.29439 66.8425 4.26758 68.1092 4.26758H102.896Z" , fill:"#FFF2D2"}
+                        //             path { d:"M226.037 40.8228C226.037 42.6735 224.536 44.1738 222.686 44.1738H219.392C217.571 44.1738 216.094 45.6503 216.094 47.4717C216.094 49.293 217.571 50.7695 219.392 50.7695H223.744C225.01 50.7695 226.037 51.7961 226.037 53.0625C226.037 54.3289 225.01 55.3555 223.744 55.3555H189.112C187.847 55.3555 186.821 54.3297 186.821 53.0645C186.821 51.7992 185.795 50.7734 184.53 50.7734H180.231C178.38 50.7734 176.88 49.2731 176.88 47.4224V46.6714C176.88 44.8206 178.38 43.3203 180.231 43.3203H183.521C185.344 43.3203 186.821 41.8429 186.821 40.0205C186.821 38.1981 188.298 36.7207 190.121 36.7207H222.686C224.536 36.7207 226.037 38.221 226.037 40.0718V40.8228Z" , fill:"#FFF2D2"}
+                        //             path { d:"M61.7024 23.3916C63.323 23.3917 64.6575 24.7595 64.6575 26.4727C64.6573 28.1857 63.3229 29.5526 61.7024 29.5527C60.0818 29.5527 58.7465 28.1858 58.7463 26.4727C58.7463 24.7594 60.0817 23.3916 61.7024 23.3916Z" , fill:"#FFF2D2" ,stroke:"#DFC685" ,stroke_width:"0.670213"}
+                        //             path { d:"M228.71 43.8857C230.33 43.8859 231.665 45.2536 231.665 46.9668C231.665 48.6798 230.33 50.0467 228.71 50.0469C227.089 50.0469 225.754 48.6799 225.754 46.9668C225.754 45.2535 227.089 43.8857 228.71 43.8857Z" , fill:"#FFF2D2" ,stroke:"#DFC685" ,stroke_width:"0.670213"}
+                        //             path { d:"M9.04993 60.9658C10.6705 60.966 12.005 62.3337 12.005 64.0469C12.0048 65.7599 10.6704 67.1268 9.04993 67.127C7.42931 67.127 6.09403 65.76 6.09387 64.0469C6.09387 62.3336 7.42921 60.9658 9.04993 60.9658Z" , fill:"#FFF2D2" ,stroke:"#DFC685" ,stroke_width:"0.670213"}
+                        //             path { d:"M188.397 13.1436C190.018 13.1437 191.353 14.5114 191.353 16.2246C191.352 17.9376 190.018 19.3046 188.397 19.3047C186.777 19.3047 185.442 17.9377 185.441 16.2246C185.441 14.5114 186.777 13.1436 188.397 13.1436Z" , fill:"#FFF2D2" ,stroke:"#DFC685" ,stroke_width:"0.670213"}
+                        //             path { d:"M114.355 68.6494C115.976 68.6495 117.31 70.0173 117.31 71.7305C117.31 73.4435 115.975 74.8104 114.355 74.8105C112.734 74.8105 111.399 73.4436 111.399 71.7305C111.399 70.0172 112.734 68.6494 114.355 68.6494Z" , fill:"#FFF2D2", stroke:"#DFC685" ,stroke_width:"0.670213"}
+                        //             path { d:"M170.298 47.2998C171.919 47.2999 173.253 48.6677 173.253 50.3809C173.253 52.0939 171.919 53.4608 170.298 53.4609C168.678 53.4609 167.342 52.094 167.342 50.3809C167.342 48.6676 168.678 47.2998 170.298 47.2998Z" , fill:"#FFF2D2" ,stroke:"#DFC685" ,stroke_width:"0.670213"}
+                        //             path { d:"M110.241 0.334961C111.862 0.335092 113.197 1.70285 113.197 3.41602C113.196 5.12904 111.862 6.49596 110.241 6.49609C108.621 6.49609 107.286 5.12912 107.285 3.41602C107.285 1.70277 108.621 0.334961 110.241 0.334961Z" , fill:"#FFF2D2" ,stroke:"#DFC685" ,stroke_width:"0.670213"}
+                        //             path { d:"M116 45.6953C114.881 45.6953 113.944 46.6327 113.944 47.751C113.944 48.8692 114.881 49.8066 116 49.8066C117.077 49.8066 118.055 48.8692 118.006 47.8003C118.055 46.6245 117.126 45.6953 116 45.6953Z" , fill:"#DFB240"}
+                        //             path { d:"M135.027 52.9809C136.318 50.7526 136.326 48.0967 135.043 45.8766L122.166 23.5768C120.892 21.3321 118.59 20 116.008 20C113.426 20 111.123 21.3403 109.849 23.5686L96.9559 45.893C95.6732 48.1378 95.6814 50.8102 96.9806 53.0385C98.2633 55.2421 100.557 56.566 103.123 56.566H128.843C131.417 56.566 133.727 55.2257 135.027 52.9809ZM132.231 51.3693C131.516 52.6027 130.249 53.3345 128.835 53.3345H103.115C101.717 53.3345 100.459 52.6191 99.7598 51.4104C99.0527 50.1852 99.0445 48.7216 99.7516 47.4882L112.645 25.172C113.344 23.9469 114.593 23.2233 116.008 23.2233C117.414 23.2233 118.672 23.9551 119.371 25.1803L132.256 47.4964C132.946 48.6969 132.938 50.1441 132.231 51.3693Z" , fill:"#DFB240"}
+                        //             path { d:"M115.49 31.2651C114.511 31.5446 113.903 32.4327 113.903 33.5098C113.952 34.1594 113.993 34.8172 114.043 35.4668C114.182 37.9418 114.322 40.3675 114.462 42.8425C114.511 43.6812 115.161 44.2897 116 44.2897C116.838 44.2897 117.496 43.6401 117.537 42.7932C117.537 42.2834 117.537 41.8147 117.586 41.2967C117.677 39.7097 117.776 38.1227 117.866 36.5358C117.915 35.5079 118.006 34.4801 118.055 33.4523C118.055 33.0823 118.006 32.7534 117.866 32.4245C117.447 31.5035 116.468 31.0348 115.49 31.2651Z" ,fill:"#DFB240"}
+        
+                        //         }
+                        //     },
+                        //     message_title: "Something went wrong".to_string(),
+                        //     message_body: error.read().clone(),
+                        //     confirm_text: Some("OK".to_string()),
+                        //     cancel_text: None,
+                        //     color: "red".to_string(),
+                        //     on_close: EventHandler::new(move |_| {
+                        //         is_error.set(false);
+                        //         error.set("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.".to_string());
+                        //     }),
+                            
+                        //     on_confirm: Some(EventHandler::new(move |_| {
+                        //         is_error.set(false);
+                        //         error.set("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum".to_string());
+                        //     })),
+                            
+                        // }
+
+                        // ErrorModal {  
+                        //     visible: is_error,
+                        //     title: "Something went wrong".to_string(),
+                        //     message: error.read().clone(),
+                        //     item_type: "red".to_string(),
+
+                        // }
+                    }                    
+                   
                 }       
             }
         }   

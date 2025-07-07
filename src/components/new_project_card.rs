@@ -29,7 +29,7 @@ pub fn NewProjectCard(props: NewProjectCardProps) -> Element {
 
     rsx! {
         div {
-            class: "w-[270px] h-[203px] border border-[#BEBEBE] rounded-xl shadow-sm flex flex-col items-center justify-center gap-2 cursor-pointer",
+            class: "w-[270px] h-[203px] border border-[#BEBEBE] rounded-xl shadow-sm flex flex-col items-center justify-center gap-2 cursor-pointer hover:shadow-md hover:scale-[1.01] cursor-pointer transition-all duration-200",
             onclick: move |_| show_modal.set(true),
             div {
                 class: "w-20 h-20 border-2 border-dashed border-[#999999] flex items-center justify-center text-[#0387D9] text-xl rounded-sm",
