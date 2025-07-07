@@ -7,7 +7,7 @@ pub fn TopBar() -> Element {
             class: "flex justify-between items-center p-4 border-b",
             div {
                 class: "flex items-center space-x-4",
-                span { class: "text-blue-500 font-semibold text-xl", "Neuron Learn AI" }
+                span { class: "text-blue-500 font-semibold text-xl", "Neural Vision" }
                 button { class: "text-sm px-3 py-1 border rounded", "Home" }
             }
             div {

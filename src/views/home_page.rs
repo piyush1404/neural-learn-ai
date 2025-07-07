@@ -5,7 +5,6 @@ use crate::store::project::{ delete_project, load_projects};
 use crate::store::project_schema::Project;
 
 const PAGE_SIZE: usize = 7;
-
 #[component]
 pub fn HomePage() -> Element {
 

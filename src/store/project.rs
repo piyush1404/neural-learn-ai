@@ -1,3 +1,4 @@
+use dioxus::prelude::*; // ✅ Fixes the Signal error
 use regex::RegexBuilder;
 use std::fs::{File, OpenOptions};
 use std::io::{BufReader, BufWriter};
@@ -5,7 +6,20 @@ use std::io::{BufReader, BufWriter};
 use crate::store::project_schema::{Project};
 
 const PROJECT_FILE_PATH: &str = "assets/realistic_projects.json";
+#[derive(Clone)]
+pub struct ProjectState {
+    pub project_id: Signal<String>,
+    pub project_name: Signal<String>,
+}
 
+impl ProjectState {
+    pub fn new() -> Self {
+        Self {
+            project_id: use_signal(|| "0".to_string()),
+            project_name: use_signal(|| "null".to_string()),
+        }
+    }
+}
 /// Load all projects from the file
 pub fn load_projects() -> Vec<Project> {
     match File::open(PROJECT_FILE_PATH) {
