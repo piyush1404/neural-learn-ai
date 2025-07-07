@@ -1,7 +1,7 @@
 
 use dioxus::prelude::*;
 use opencv::{
-    core::{Mat, Rect, Scalar, Vector},
+    core::{AlgorithmHint, Mat, Rect, Scalar, Vector},
     imgcodecs::{imencode, imread, IMREAD_COLOR},
     imgproc,
     prelude::*,
@@ -157,7 +157,7 @@ pub fn Learn(app_state: AppState) -> Element {
 
                         let mut processed = Mat::default();
                         if is_grayscale {
-                            imgproc::cvt_color(&cropped, &mut processed, imgproc::COLOR_BGR2GRAY, 0).unwrap();
+                            imgproc::cvt_color(&cropped, &mut processed, imgproc::COLOR_BGR2GRAY, 0, AlgorithmHint::ALGO_HINT_DEFAULT,).unwrap();
                         } else {
                             processed = cropped.clone();
                         }
