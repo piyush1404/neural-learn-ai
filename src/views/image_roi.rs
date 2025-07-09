@@ -6,6 +6,7 @@ use opencv::{
     imgproc,
     prelude::*,
 };
+use opencv::core::AlgorithmHint;
 use rfd::FileDialog;
 use opencv::core::Size;
 
@@ -158,6 +159,7 @@ pub fn ImageRoi() -> Element {
                                 &mut processed,
                                 imgproc::COLOR_BGR2GRAY,
                                 0,
+                                AlgorithmHint::ALGO_HINT_DEFAULT,
                             ).expect("Grayscale conversion failed");
                         } else {
                             processed = cropped.clone(); // RGB (BGR actually in OpenCV)

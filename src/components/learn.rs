@@ -5,6 +5,7 @@ use opencv::{
     imgproc,
     prelude::*,
 };
+use opencv::core::AlgorithmHint;
 use rfd::FileDialog;
 use base64::{engine::general_purpose::STANDARD, Engine};
 use crate::views::project_details::AppState;
@@ -158,7 +159,11 @@ pub fn Learn(app_state: AppState) -> Element {
 
                         let mut processed = Mat::default();
                         if is_grayscale {
-                            imgproc::cvt_color(&cropped, &mut processed, imgproc::COLOR_BGR2GRAY, 0).unwrap();
+                            imgproc::cvt_color(  &cropped,
+                                &mut processed,
+                                imgproc::COLOR_BGR2GRAY,
+                                0,
+                                AlgorithmHint::ALGO_HINT_DEFAULT).unwrap();
                         } else {
                             processed = cropped.clone();
                         }

@@ -1,5 +1,41 @@
 [
   {
+    "id": "279b0eab-54d7-433c-9f17-f0b63309f16f",
+    "name": "project demo",
+    "platform": "Simulation",
+    "interface": "Image",
+    "type": "vision",
+    "description": "demo",
+    "created_at": "2025-07-02T11:35:17.961531200+00:00",
+    "updated_at": "2025-07-02T11:35:17.961531200+00:00",
+    "files": null,
+    "neurons": null,
+    "categories": [
+      {
+        "id": 0,
+        "name": "Background",
+        "color": "#4C4C4C",
+        "context_id": 0
+      }
+    ],
+    "feature_extraction": {
+      "algorithm": "Subsample",
+      "normalized": false,
+      "roi_width": 64,
+      "roi_height": 64,
+      "block_width": 16,
+      "block_height": 16,
+      "if_field_range": {
+        "min": 0,
+        "max": 255
+      }
+    },
+    "learn_properties": null,
+    "recognize_properties": null,
+    "annotations": null,
+    "knowledge": null
+  },
+  {
     "id": "75b2256a-39e4-4e5e-988c-f521065601ed",
     "name": "test project",
     "platform": "Brilliant",
