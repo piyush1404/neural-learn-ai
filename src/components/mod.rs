@@ -9,3 +9,7 @@ pub mod tabs;
 pub mod project_form;
 pub mod knowledge_modal;
 pub mod option_annotations;
+pub mod delete_alert_modal;
+pub mod error_alert_modal;
+pub mod successful_alert_modal;
+

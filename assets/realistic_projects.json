@@ -1,5 +1,6 @@
 [
   {
+<<<<<<< HEAD
     "id": "504daedb-9378-4586-ad41-34a8d2f647f1",
     "name": "Smart Vehicle Type Detector",
     "platform": "Brilliant",
@@ -8,11 +9,22 @@
     "description": "Classifies parked vehicles into \"car\", \"bike\", or \"truck\" based on aerial images.Classifies parked vehicles into \"car\", \"bike\", or \"truck\" based on aerial images.Classifies parked vehicles into \"car\",",
     "created_at": "2025-07-09T08:50:31.637002+00:00",
     "updated_at": "2025-07-09T08:50:31.637002+00:00",
+=======
+    "id": "279b0eab-54d7-433c-9f17-f0b63309f16f",
+    "name": "project demo",
+    "platform": "Simulation",
+    "interface": "Image",
+    "type": "vision",
+    "description": "demo",
+    "created_at": "2025-07-02T11:35:17.961531200+00:00",
+    "updated_at": "2025-07-02T11:35:17.961531200+00:00",
+>>>>>>> main
     "files": null,
     "neurons": null,
     "categories": [
       {
         "id": 0,
+<<<<<<< HEAD
         "name": "Car",
         "color": "#d61f1f",
         "context_id": 0
@@ -35,6 +47,166 @@
         "min": 1,
         "max": 16
       }
+=======
+        "name": "Background",
+        "color": "#4C4C4C",
+        "context_id": 0
+      }
+    ],
+    "feature_extraction": {
+      "algorithm": "Subsample",
+      "normalized": false,
+      "roi_width": 64,
+      "roi_height": 64,
+      "block_width": 16,
+      "block_height": 16,
+      "if_field_range": {
+        "min": 0,
+        "max": 255
+      }
+    },
+    "learn_properties": null,
+    "recognize_properties": null,
+    "annotations": null,
+    "knowledge": null
+  },
+    {
+        "id": "4103c152-8e79-4ddd-96df-50d50cb24894",
+        "name": "Retail Vision AI",
+        "platform": "Brilliant",
+        "interface": "HDMI",
+        "type": "vision",
+        "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+        "created_at": "2024-01-10T09:15:00Z",
+        "updated_at": "2024-01-15T12:30:00Z",
+        "files": [
+            {
+                "id": 101,
+                "path": "images/retail_shelf_1.jpg",
+                "type": "image"
+            }
+        ],
+        "neurons": {
+            "min_if": 5,
+            "max_if": 45000,
+            "search_area": [
+                0,
+                0,
+                128,
+                128
+            ],
+            "total_neurons": 4096,
+            "committed_neurons": 16
+        },
+        "categories": [
+            {
+                "id": 1,
+                "name": "empty_space",
+                "color": "#FF9900",
+                "context_id": 1
+            },
+            {
+                "id": 2,
+                "name": "product",
+                "color": "#33CC33",
+                "context_id": 2
+            }
+        ],
+        "feature_extraction": {
+            "algorithm": "HOG",
+            "normalized": true,
+            "roi_width": 64,
+            "roi_height": 64,
+            "block_width": 2,
+            "block_height": 2,
+            "if_field_range": {
+                "min": 5,
+                "max": 45000
+            }
+        },
+        "learn_properties": {
+            "step_xy": {
+                "x": 2,
+                "y": 2,
+                "metric": "px"
+            },
+            "auto_learn": true
+        },
+        "recognize_properties": {
+            "output_mode": "Object",
+            "step_xy": {
+                "x": 2,
+                "y": 2,
+                "metric": "px"
+            },
+            "skip_xy": {
+                "x": 2,
+                "y": 2
+            },
+            "auto_recognize": true,
+            "full_image": true,
+            "show_mode": "Heatmap"
+        },
+        "annotations": {
+            "options": {
+                "auto_surrounding_examples": "Top3",
+                "positions": {
+                    "directions": [
+                        "N",
+                        "E",
+                        "S",
+                        "W"
+                    ],
+                    "distance_to_center": 8
+                }
+            },
+            "annotations": [
+                {
+                    "id": 1,
+                    "category_id": 1,
+                    "file_id": 101,
+                    "x": 12,
+                    "y": 20,
+                    "width": 30,
+                    "height": 30,
+                    "label": "Empty"
+                },
+                {
+                    "id": 2,
+                    "category_id": 2,
+                    "file_id": 101,
+                    "x": 60,
+                    "y": 45,
+                    "width": 25,
+                    "height": 25,
+                    "label": "Product"
+                }
+            ]
+        },
+        "knowledge": {
+            "categories": [
+                {
+                    "id": 1,
+                    "base64": "ZW1wdHlfc3BhY2U="
+                },
+                {
+                    "id": 2,
+                    "base64": "cHJvZHVjdA=="
+                }
+            ],
+            "neurons": [
+                {
+                    "neuron_id": 11,
+                    "category": 2,
+                    "ncr": 25431,
+                    "model": "RetailNet-v1",
+                    "active_if": 18,
+                    "min_if": 5,
+                    "degenerate": false
+                }
+            ]
+        }
+>>>>>>> main
     },
     "learn_properties": null,
     "recognize_properties": null,

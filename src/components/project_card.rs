@@ -1,5 +1,6 @@
 use crate::{components::project_form::ProjectForm, store::project_schema::NeuronConfig};
 use dioxus::prelude::*;
+<<<<<<< HEAD
 
 const PLATFORM: Asset = asset!("/assets/icons/platform.svg");
 const SIMULATION: Asset = asset!("/assets/icons/simulation.svg");
@@ -8,9 +9,15 @@ const BRILLANT: Asset = asset!("/assets/icons/brillant.svg");
 const COMPLETE_BRAIN: Asset = asset!("/assets/icons/complete_brain.svg");
 const INCOMPLETE_BRAIN: Asset = asset!("/assets/icons/incomplete_brain.svg");
 
+=======
+>>>>>>> main
 use crate::date_format::format_date_mmddyyyy;
-
 use crate::store::project::get_project_by_id;
+use crate::components::delete_alert_modal::DeleteModal;
+use crate::components::delete_alert_modal::ToastType;
+use std::time::Duration;
+use dioxus::prelude::spawn;
+use tokio::time::sleep;
 
 #[component]
 pub fn ProjectCard(
@@ -24,11 +31,12 @@ pub fn ProjectCard(
     neurons: Option<NeuronConfig>,
     is_updating:Option<Signal<bool>>
 ) -> Element {
+    let mut delete_modal_visible = use_signal(|| false);
 
     let project = get_project_by_id(&id).unwrap();
     let project = project.clone();
     // println!("Project: {:#?}", project);
-
+    let toast: Signal<Option<ToastType>> = use_signal(|| None);
     let (min_if, max_if, search_area_str, total_neurons, committed_neurons) =
         if let Some(n) = &neurons {
             (
@@ -108,6 +116,19 @@ pub fn ProjectCard(
     let mut hovered = use_signal(|| false);
 
     let mut show_edit_modal = use_signal(|| false);
+
+    //let mut modal = use_delete_modal();
+
+    let toast_clone = toast.clone();
+    use_effect(move || {
+        if toast_clone().is_some() {
+            let mut toast_clone = toast_clone.clone();
+            spawn(async move {
+                sleep(Duration::from_millis(2500)).await;
+                toast_clone.set(None);
+            });
+        }
+    });
 
     
     let icon_svg = match interface.as_str() {
@@ -214,7 +235,16 @@ pub fn ProjectCard(
     };
 
     rsx! {
-        div {
+        DeleteModal {
+            visible: delete_modal_visible.clone(),
+            title: "Delete Project".to_string(),
+            message: "Are you sure you want to delete this project? This action can't be undo".to_string(),
+            item_type: "Project".to_string(),
+            toast: toast.clone(),
+        } 
+        
+            div {
+            // onmouseenter: move |_| hovered.set(true),
             onmouseleave: move |_| hovered.set(false),
             class: "transition-all duration-300",
             if hovered() {
@@ -420,10 +450,13 @@ pub fn ProjectCard(
                             div {
                                 class: "flex gap-[10px]",
                                 button {
-                                    class: "bg-[#F0F0F0] px-[10px] py-1 rounded-[3px] text-xs font-medium text-[#101010] ",
+                                    class: "bg-[#F0F0F0] px-[10px] py-1 rounded-[3px] text-xs font-medium text-[#101010]",
+                                    onclick: move |_| {
+                                        delete_modal_visible.set(true);
+                                    },
                                     "Delete"
                                 }
-                                button {
+                            button {
                                     onclick: move |_| show_edit_modal.set(true),
                                     class: "bg-[#101010] px-[10px] py-1 rounded-[3px] text-xs font-medium text-[#FFFFFF] ",
                                     "Edit"
@@ -443,5 +476,20 @@ pub fn ProjectCard(
 
             }
         }
+        if let Some(toast_val) = toast() {
+            {
+                let (bg_class, msg) = match toast_val {
+                    ToastType::Success(msg) => ("bg-green-600", msg),
+                    ToastType::Error(msg) => ("bg-red-500", msg),
+                };
+                rsx!(
+                    div {
+                        class: format!("fixed top-6 right-6 z-50 px-4 py-2 rounded shadow-lg text-white font-semibold transition-all duration-300 {}", bg_class),
+                        "{msg}"
+                    }
+                )
+            }
+        }
     }
+
 }
