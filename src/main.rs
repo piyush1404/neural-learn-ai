@@ -21,6 +21,7 @@ fn main() {
         .with_cfg(
             Config::default()
                 .with_window(WindowBuilder::new().with_title("Neural Vision"))
+                .with_menu(None),
         )
         .launch(app);
 }
@@ -91,7 +92,7 @@ fn app() -> Element {
         style { "{include_str!(\"../assets/tailwind.css\")}" }
 
         div {
-            class: "w-full h-full bg-white font-poppins px-7",
+            class: "w-full h-full bg-white font-poppins",
             components::tabs::Tabs {}
 
             match tabs.iter().find(|t| t.id == *ctx.active_tab.read()) {

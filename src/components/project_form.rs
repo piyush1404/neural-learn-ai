@@ -251,6 +251,9 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
     let mut is_error=use_signal(|| false);
     let mut error = use_signal(|| "".to_string());
 
+    let mut is_success=use_signal(|| false);
+    let mut success = use_signal(|| "".to_string());
+    
     rsx! {
         div {
             class: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50",
@@ -292,7 +295,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                         label { class: "block mb-1 font-normal text-xs text-[#404040]", "Project Name" }
                         input {
                             class: "w-full border-[0.5px] border-[#8F8F8F] rounded px-4 py-1 font-normal text-xs text-[#313131",
-                            maxlength: "50",
+                            // maxlength: "50",
                             value: "{project_name}",
                             oninput: move |e| {
                                 let value = e.value().to_string();
@@ -389,7 +392,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                             description.set(value);
                         }
                     }
-                    if  project_name_error() {
+                    if  description_error() {
                         p {
                             class: "text-xs text-red-500 mt-1",
                             "Description cannot exceed 50 characters."
@@ -592,30 +595,6 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
 
                                 }
                                 
-                        
-                                // div {
-                                //     class: "absolute bottom-[20px] right-[10px]",
-                                //     button {
-                                //         class: "bg-[#0387D9] text-[#FFFFFF] px-4 py-1 rounded-[13px] text-sm",
-                                //         onclick: move |_| {
-                                //             categories.set(vec![
-                                //                 Category {
-                                //                     id: 1,
-                                //                     name: "Background".to_string(),
-                                //                     color: "#4C4C4C".to_string(),
-                                //                     context_id: 101,
-                                //                 },
-                                //                 Category {
-                                //                     id: 2,
-                                //                     name: "Object".to_string(),
-                                //                     color: "#F85858".to_string(),
-                                //                     context_id: 101,
-                                //                 },
-                                //             ]);
-                                //         },
-                                //         "Reset"
-                                //     }
-                                // }
                             }
                         }
                 
@@ -878,7 +857,9 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                             "description": description.read().to_string(),
                                             "created_at": utc_iso,
                                             "updated_at": utc_iso,
-                                            "categories": categories.read().iter().map(|cat| {
+                                            "categories": categories.read().iter()
+                                            .filter(|cat| !cat.name.trim().is_empty()) 
+                                            .map(|cat| {
                                                 serde_json::json!({
                                                     "id": cat.id,
                                                     "name": cat.name,
@@ -954,14 +935,17 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                             patch_payload.insert("neurons".to_string(), Value::String(format!("{:?}", neurons.unwrap())));
                                         }
 
-                                        let categories = categories.read().iter().map(|cat| {
+                                        let categories = categories.read().iter()
+                                        .filter(|cat| !cat.name.trim().is_empty()) 
+                                        .map(|cat| {
                                             json!({
                                                 "id": cat.id,
                                                 "name": cat.name,
                                                 "color": cat.color,
                                                 "context_id": cat.context_id
                                             })
-                                        }).collect::<Vec<_>>();
+                                        })
+                                        .collect::<Vec<_>>();
                                         if !categories.is_empty() {
                                             patch_payload.insert("categories".to_string(), Value::Array(categories));
                                         }
@@ -992,7 +976,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                         // println!("{:#?}", patch_payload);
 
                                         let deserialized: Result<Project, _> = serde_json::from_value(Value::Object(patch_payload));
-                                        println!("{:#?}", deserialized);
+                                        // println!("{:#?}", deserialized);
                                         match deserialized {
                                             Ok(project) => {
                                                 match update_project(&id, project) {
