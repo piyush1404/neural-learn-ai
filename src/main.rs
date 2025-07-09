@@ -3,7 +3,6 @@ use dioxus::prelude::*;
 use dioxus::LaunchBuilder;
 const MAIN_CSS: Asset = asset!("/assets/main.css");
 const TAILWIND_CSS: Asset = asset!("/assets/tailwind.css");
-
 mod state;
 mod components;
 mod date_format;
@@ -15,18 +14,20 @@ use state::tabs::TabContext;
 use components::top_bar::TopBar;
 use views::home_page::HomePage;
 use views::project_details::ProjectDetails;
-
+use store::project::ProjectState;
 
 fn main() {
     LaunchBuilder::new()
         .with_cfg(
             Config::default()
-                .with_window(WindowBuilder::new().with_title("Neuron Learn AI"))
+                .with_window(WindowBuilder::new().with_title("Neural Vision"))
+                .with_menu(None),
         )
         .launch(app);
 }
 
 fn app() -> Element {
+    provide_context(ProjectState::new());
     let tab_context = use_signal(TabContext::new); // ✅ stays persistent
 
     use_context_provider(|| tab_context.clone());
@@ -91,7 +92,7 @@ fn app() -> Element {
         style { "{include_str!(\"../assets/tailwind.css\")}" }
 
         div {
-            class: "w-full h-full bg-white font-poppins px-7",
+            class: "w-full h-full bg-white font-poppins",
             components::tabs::Tabs {}
 
             match tabs.iter().find(|t| t.id == *ctx.active_tab.read()) {

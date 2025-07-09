@@ -2,16 +2,21 @@ use dioxus::{html::tr, prelude::*};
 
 use crate::components::{knowledge_modal::KnowledgeModal, option_annotations::OptionForAnnotation};
 use crate::views::project_details::{AppState, SharedData};
+use crate::store::project::ProjectState;
 
 #[component]
 pub fn MenuBar(app_state: AppState) -> Element {
     let mut shared = app_state.shared;
     let shared_props = shared().clone();
-    let mut selected_annotation = use_signal(|| "".to_string());
+    // println!("MenuBar entered with algorithm: ");
+    let project_state = use_context::<ProjectState>();
+    // println!("Project ID: {}", (project_state.project_id)());
+    // println!("Project Name: {}", (project_state.project_name)());
+    let project_name = project_state.project_name.clone();
+    let mut selected_annotation = use_signal(|| "".to_string()); 
     let mut show_modal_options = use_signal(|| false);
     let mut selected_knowledge = use_signal(|| "".to_string());
     let mut show_modal_knowledge_view = use_signal(|| false);
-
     rsx! {
         div {
             class:"h-[40px] flex items-center gap-2 mx-6",
@@ -42,7 +47,7 @@ pub fn MenuBar(app_state: AppState) -> Element {
                     }
 
                     }
-                span { class: "text-[#404040] font-nomal text-sm", "Sensor Chip*" }
+                span { class: "text-[#404040] font-nomal text-sm", {project_name} }
                 span {
                     svg {
                         width: "18",
@@ -59,9 +64,9 @@ pub fn MenuBar(app_state: AppState) -> Element {
                 }
             }
             div {
-                class:"w-full flex items-center justify-end gap-4",
-                select {
-                    class: "px-3 py-1 font-normal text-[11px] text-[#555555] appearance-none pr-5",
+                class:"w-full flex items-center justify-end gap-2",
+                div {select {
+                    class: "px-3 py-1 font-normal text-[11px] w-[105px] text-[#555555] appearance-none",
                     value: "{selected_annotation}",
 
                     style: r#"
@@ -92,10 +97,10 @@ pub fn MenuBar(app_state: AppState) -> Element {
                 if *show_modal_options.read() {
         
                     OptionForAnnotation { show_modal_options: show_modal_options, selected_annotation: selected_annotation }
-                }
+                }}
                 
-                select {
-                    class: "px-3 py-1 font-normal text-[11px] text-[#555555] appearance-none pr-7",
+                div {select {
+                    class: "px-3 py-1 font-normal text-[11px] w-[100px] text-[#555555] appearance-none",
                     style: r#"
                     color: #555555;
                     background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.99997 5.70028C4.82075 5.70028 4.64155 5.63185 4.50492 5.49528L0.205141 1.19546C-0.0683804 0.921938 -0.0683804 0.478469 0.205141 0.205058C0.478552 -0.0683528 0.921933 -0.0683528 1.19548 0.205058L4.99997 4.00978L8.80449 0.205191C9.07801 -0.0682199 9.52135 -0.0682199 9.79474 0.205191C10.0684 0.478602 10.0684 0.922071 9.79474 1.19559L5.49503 5.49541C5.35832 5.63201 5.17913 5.70028 4.99997 5.70028Z' fill='%23555555'/%3E%3C/svg%3E");
@@ -122,10 +127,10 @@ pub fn MenuBar(app_state: AppState) -> Element {
 
                 if show_modal_knowledge_view(){
                     KnowledgeModal { show_modal_knowledge_view: show_modal_knowledge_view, selected_knowledge: selected_knowledge }
-                }
+                }}
 
-                select {
-                    class: "px-3 py-1 font-normal text-[11px] text-[#555555] appearance-none pr-7",
+                div {select {
+                    class: "px-3 py-1 font-normal text-[11px] w-20 text-[#555555] appearance-none",
                     style: r#"
                     color: #555555;
                     background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.99997 5.70028C4.82075 5.70028 4.64155 5.63185 4.50492 5.49528L0.205141 1.19546C-0.0683804 0.921938 -0.0683804 0.478469 0.205141 0.205058C0.478552 -0.0683528 0.921933 -0.0683528 1.19548 0.205058L4.99997 4.00978L8.80449 0.205191C9.07801 -0.0682199 9.52135 -0.0682199 9.79474 0.205191C10.0684 0.478602 10.0684 0.922071 9.79474 1.19559L5.49503 5.49541C5.35832 5.63201 5.17913 5.70028 4.99997 5.70028Z' fill='%23555555'/%3E%3C/svg%3E");
@@ -139,10 +144,10 @@ pub fn MenuBar(app_state: AppState) -> Element {
                     option { value: "review_all", "Review all" }
                     option { value: "save_all", "Save all" }
                     option { value: "details_at_cursor", "Details at cursor" }
-                }
+                }}
 
-                select {
-                    class: "px-3 py-1 font-normal text-[11px] text-[#555555] appearance-none pr-7",
+                div{select {
+                    class: "px-3 py-1 font-normal text-[11px] w-[80px] text-[#555555] appearance-none",
                     style: r#"
                     color: #555555;
                     background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.99997 5.70028C4.82075 5.70028 4.64155 5.63185 4.50492 5.49528L0.205141 1.19546C-0.0683804 0.921938 -0.0683804 0.478469 0.205141 0.205058C0.478552 -0.0683528 0.921933 -0.0683528 1.19548 0.205058L4.99997 4.00978L8.80449 0.205191C9.07801 -0.0682199 9.52135 -0.0682199 9.79474 0.205191C10.0684 0.478602 10.0684 0.922071 9.79474 1.19559L5.49503 5.49541C5.35832 5.63201 5.17913 5.70028 4.99997 5.70028Z' fill='%23555555'/%3E%3C/svg%3E");
@@ -155,7 +160,7 @@ pub fn MenuBar(app_state: AppState) -> Element {
                     option { value: "cursor_info", "Cursor info" }
                     option { value: "timing_info", "Timing info" }
                     option { value: "save_transform_image", "Save transform image" }
-                }
+                }}
 
             }
             div {

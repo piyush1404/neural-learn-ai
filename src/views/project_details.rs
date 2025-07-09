@@ -4,28 +4,38 @@ use crate::components::learn::Learn;
 use crate::components::menu_bar::MenuBar;
 use crate::components::recognize::Recognize;
 use crate::components::setting::Setting;
+use crate::state::tabs::TabContext;
 
 // Shared struct
 #[derive(Clone)]
 pub struct SharedData {
     pub algorithm: String,
-    pub clear_clicked: bool,
+    pub clear_clicked: bool
 }
-
 #[derive(PartialEq, Props, Clone)]
 pub struct AppState {
-    pub shared: Signal<SharedData>,
+    pub shared: Signal<SharedData>
 }
 
 #[component]
 pub fn ProjectDetails() -> Element {
+    let mut tab_context = use_context::<Signal<TabContext>>();
+    // Print tabs
+    let ctx = tab_context.read();
+    let tabs = ctx.tabs.read();
+    let active_id = ctx.active_tab.read();
+
+    // println!("🧠 Total Tabs (in effect): {}", tabs.len());
+    // println!("⭐ Active Tab ID: {}", active_id);
+    // for (i, tab) in tabs.iter().enumerate() {
+    //     println!("#{}: [{}] {} {:?}", i, tab.id, tab.title, tab.icon);
+    // }
     let shared = use_signal(|| SharedData {
         algorithm: "grayscale".to_string(),
         clear_clicked: false
     });
 
     let app_state = AppState { shared };
-
     rsx! {
         div {
             class: "flex mt-1",

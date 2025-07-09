@@ -1,11 +1,11 @@
+
 use dioxus::prelude::*;
 use opencv::{
-    core::{Mat, Rect, Scalar, Vector},
+    core::{AlgorithmHint, Mat, Rect, Scalar, Vector},
     imgcodecs::{imencode, imread, IMREAD_COLOR},
     imgproc,
     prelude::*,
 };
-use opencv::core::AlgorithmHint;
 use rfd::FileDialog;
 use base64::{engine::general_purpose::STANDARD, Engine};
 use crate::views::project_details::AppState;
@@ -36,8 +36,6 @@ struct RectState {
 #[component]
 pub fn Learn(app_state: AppState) -> Element {
     let mut shared = app_state.shared;
-    println!("state: {:?}", shared().algorithm);
-    println!("state: {:?}", shared().clear_clicked);
     // let clear_clicked = shared().clear_clicked;
     let mut image_data = use_signal(|| None as Option<ImageData>);
     use_effect(move || {
@@ -148,7 +146,7 @@ pub fn Learn(app_state: AppState) -> Element {
                     &mut cloned,
                     rect,
                     Scalar::new(0.0, 255.0, 0.0, 0.0),
-                    2,
+                    6,
                     imgproc::LINE_8,
                     0,
                 );
@@ -159,11 +157,7 @@ pub fn Learn(app_state: AppState) -> Element {
 
                         let mut processed = Mat::default();
                         if is_grayscale {
-                            imgproc::cvt_color(  &cropped,
-                                &mut processed,
-                                imgproc::COLOR_BGR2GRAY,
-                                0,
-                                AlgorithmHint::ALGO_HINT_DEFAULT).unwrap();
+                            imgproc::cvt_color(&cropped, &mut processed, imgproc::COLOR_BGR2GRAY, 0, AlgorithmHint::ALGO_HINT_DEFAULT,).unwrap();
                         } else {
                             processed = cropped.clone();
                         }
