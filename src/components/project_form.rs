@@ -187,24 +187,28 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
 
         rsx!(
             li {
-                class: "flex items-center gap-2 px-4 py-2 text-[#FFFFFF] rounded hover:bg-[#555555] cursor-pointer",
+                class: "flex items-center gap-2 px-4 py-2 rounded cursor-pointer hover:bg-[#555555] hover:text-[#FFFFFF] text-[#555555]",
                 onclick: move |_| {
                     selected_label.set(label.clone());
                     selected_icon.set(Ok(icon_element.clone()));
                     show_options.set(false);
-                     if label == "Audio" {
+                    if label == "Audio" {
                         show_modal_feature_extraction_panel.set(true);
-                    }else {
+                    } else {
                         show_modal_feature_extraction_panel.set(false);
                     }
                 },
-                {icon_element_for_display} // use the clone here
-                span { "{label}" }
+                {icon_element_for_display}
+                span { 
+                    class: "font-normal text-xs pl-1",
+                    "{label}"
+                }
             }
         )
+        
+        
     })
     .collect();
-
     let  feature_extraction_panel_class = if show_modal_feature_extraction_panel() {
         "pt-3 w-[56%] opacity-50 pointer-events-none"
     } else {
@@ -367,28 +371,29 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                             // Dropdown options
                             if show_options() {
                                 ul {
-                                    class: "absolute w-full bg-white border mt-1 rounded shadow z-10",
+                                    class: "absolute w-full bg-white border mt-1 rounded-xl shadow z-10",
                                     {option_list.into_iter()}
                                 }
                             }
                         }
                        
                     }
+
                 }
                 div {
                     class: "col-span-3 mt-4",
                     div {
                         class: "flex justify-between items-center bg-[#EFEFEF] mb-1 text-xs text-[#404040]",
                         span { "Description" }
-                        span { "{description.read().len()}/100 alphabets" }
+                        span { "{description.read().len()}/200 alphabets" }
                     }
                     textarea {
                         class: "w-full border border-[#8F8F8F] rounded font-poppins font-normal px-4 py-1 text-xs text-[#313131] resize-none bg-[#FFFFFF] appearance-none outline-none",
-                        maxlength: "100",
+                        maxlength: "200",
                         value: "{description}",
                         oninput: move |e| {
                             let value = e.value().to_string();
-                            description_error.set(value.len() > 100);
+                            description_error.set(value.len() > 200);
                             description.set(value);
                         }
                     }
@@ -823,24 +828,28 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                         // Collect validation errors
                                         if project_name.read().trim().is_empty() {
                                             error.set("Project name cannot be empty".to_string());
+                                            println!("error: {}", error.read());
                                             is_error.set(true);
                                             return; // ✅ Prevents further execution
                                         }
 
                                         if platform.read().trim().is_empty() {
                                             error.set("Platform cannot be empty".to_string());
+                                            println!("error: {}", error.read());
                                             is_error.set(true);
                                             return;
                                         }
 
                                         if selected_label.read().trim().is_empty() {
                                             error.set("Interface cannot be empty".to_string());
+                                            println!("error: {}", error.read());
                                             is_error.set(true);
                                             return;
                                         }
 
                                         if description.read().trim().is_empty() {
                                             error.set("Description cannot be empty".to_string());
+                                            println!("error: {}", error.read());
                                             is_error.set(true);
                                             return;
                                         }
@@ -893,9 +902,38 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                                 eprintln!("Failed to deserialize project_form_data: {}", e);
                                             }
                                         }   
-                                    open_image_roi(&id, project_name.read().clone());
+                                    // open_image_roi(&id, project_name.read().clone());
 
                                     }else {
+                                        // Collect validation errors
+                                        if project_name.read().trim().is_empty() {
+                                            error.set("Project name cannot be empty".to_string());
+                                            is_error.set(true);
+                                            println!("error : {}",error());
+                                            return; // ✅ Prevents further execution
+                                        }
+
+                                        if platform.read().trim().is_empty() {
+                                            error.set("Platform cannot be empty".to_string());
+                                            is_error.set(true);
+                                            println!("error : {}",error());
+                                            return;
+                                        }
+
+                                        if selected_label.read().trim().is_empty() {
+                                            error.set("Interface cannot be empty".to_string());
+                                            is_error.set(true);
+                                            println!("error : {}",error());
+                                            return;
+                                        }
+
+                                        if description.read().trim().is_empty() {
+                                            error.set("Description cannot be empty".to_string());
+                                            is_error.set(true);
+                                            println!("error : {}",error());
+                                            return;
+                                        }
+
                                         let id = props.project.as_ref().unwrap().id.clone();
                                         println!("Creating in ELSE new project with ID: {}", id);
 
@@ -988,7 +1026,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                                 eprintln!("Failed to deserialize project_form_data: {}", e);
                                             }
                                         }
-                                        open_image_roi(&id, project_name.read().clone());
+                                        // open_image_roi(&id, project_name.read().clone());
 
                                     }
                                     show_modal.set(false);
@@ -998,7 +1036,7 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                                     // println!("id: {}", id);
                                     // println!("props.project is: {:?}", props.project);
                                     // println!("name: {}", project_name.read());
-                                    open_image_roi("1", project_name.read().clone());
+                                    // open_image_roi("1", project_name.read().clone());
 
                                 },
                                 class: "font-medium text-xs bg-[#101010] text-[#FFFFFF] rounded-[3px] px-4 py-1",
@@ -1072,15 +1110,5 @@ pub fn ProjectForm(props: ProjectFormProps) -> Element {
                 }       
             }
         }   
-    }
-}
-
-fn extract_hex(color: &str) -> String {
-    match color {
-        "bg-red-500" => "#ef4444".to_string(),
-        "bg-black" => "#000000".to_string(),
-        "bg-zinc-800" => "#27272a".to_string(),
-        hex if hex.starts_with('#') => hex.to_string(),
-        _ => "#000000".to_string(), // fallback
     }
 }
