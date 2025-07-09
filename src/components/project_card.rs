@@ -1,7 +1,5 @@
 use crate::{components::project_form::ProjectForm, store::project_schema::NeuronConfig};
 use dioxus::prelude::*;
-<<<<<<< HEAD
-
 const PLATFORM: Asset = asset!("/assets/icons/platform.svg");
 const SIMULATION: Asset = asset!("/assets/icons/simulation.svg");
 // const NUEROSHIELD: Asset = asset!("/assets/icons/nueroshield.svg");
@@ -9,8 +7,6 @@ const BRILLANT: Asset = asset!("/assets/icons/brillant.svg");
 const COMPLETE_BRAIN: Asset = asset!("/assets/icons/complete_brain.svg");
 const INCOMPLETE_BRAIN: Asset = asset!("/assets/icons/incomplete_brain.svg");
 
-=======
->>>>>>> main
 use crate::date_format::format_date_mmddyyyy;
 use crate::store::project::get_project_by_id;
 use crate::components::delete_alert_modal::DeleteModal;
